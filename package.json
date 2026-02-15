@@ -1,19 +1,34 @@
 {
-  "name": "smartcommit",
+  "name": "gitbun",
   "version": "0.1.0",
-  "description": "AI-powered commit assistant",
-  "main": "dist/index.js",
+  "description": "A comfy git commit assistant with optional AI enhancement",
+  "main": "dist/src/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
-    "smartcommit": "dist/bin/smartcommit.js"
+    "gitbun": "dist/bin/smartcommit.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "ts-node bin/smartcommit.ts",
     "start": "node dist/bin/smartcommit.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "git",
+    "commit",
+    "cli",
+    "developer-tools",
+    "conventional-commits"
+  ],
+  "author": "Nirvik Goswami",
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "chalk": "^5.6.2",
     "commander": "^14.0.3",

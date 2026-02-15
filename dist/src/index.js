@@ -80,21 +80,7 @@ async function run(options) {
         }
         finalMessage = result;
     }
-    // Perform commit
-    const result = await (0, commit_1.commit)(finalMessage);
-    console.log("");
-    if (result.summary) {
-        const { changes, insertions, deletions } = result.summary;
-        const fileWord = changes === 1 ? "file" : "files";
-        console.log(chalk_1.default.gray(`${changes} ${fileWord} changed, ` +
-            `${insertions} insertion${insertions === 1 ? "" : "s"}(+), ` +
-            `${deletions} deletion${deletions === 1 ? "" : "s"}(-)`));
-    }
-    if (result.files && result.files.length > 0) {
-        console.log("\nChanged files:");
-        result.files.forEach((file) => {
-            console.log(`  • ${file}`);
-        });
-    }
-    console.log("");
+    // Perform commit (git-native output)
+    const output = await (0, commit_1.commit)(finalMessage);
+    console.log("\n" + output);
 }

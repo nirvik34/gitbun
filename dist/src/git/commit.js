@@ -7,6 +7,10 @@ exports.commit = commit;
 const simple_git_1 = __importDefault(require("simple-git"));
 async function commit(message) {
     const git = (0, simple_git_1.default)();
-    const result = await git.commit(message);
-    return result;
+    const output = await git.raw([
+        "commit",
+        "-m",
+        message
+    ]);
+    return output;
 }

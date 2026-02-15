@@ -1,0 +1,49 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+
+# VS Code
+.vscode/
+
+# Env files
+.env
+.env.*
+
+# Coverage
+coverage/
+
+# Misc
+*.swp
+*.swo
+
+# Bin outputs
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.dylib
+
+# IDEs
+.idea/
+*.iml
+
+# Docs cache
+*.tmp
