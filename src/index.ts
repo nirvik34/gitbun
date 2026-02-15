@@ -8,9 +8,9 @@ import { generateSummary } from './analyzer/summarizer';
 import { generateCommitMessage } from "./generator/commitGenerator";
 import { confirmCommit } from "./ui/interactive";
 import { commit } from "./git/commit";
+import { enhanceCommit } from "./llm/ollamaEnhancer";
 
-
-export async function run(){
+export async function run(options:any){
     const repo = await isGitRepo();
     if(!repo){
         console.log(chalk.red("Not inside a Git repository."));
@@ -56,27 +56,42 @@ export async function run(){
     const scope = detectScope(enrichedFiles.map(f => f.path));
     const type = classifyCommitType(enrichedFiles);
     const summary = generateSummary(enrichedFiles);
-    const commitMessage = generateCommitMessage(type,scope,enrichedFiles);
+    let commitMessage = generateCommitMessage(type, scope, enrichedFiles);
+
+    if (options.ai) {
+    console.log("\nEnhancing with AI...");
+    commitMessage = await enhanceCommit(commitMessage, summary);
+    }
 
 
 
-    console.log(`Scope:${scope}`);
-    console.log(`Type:${type}`);
-    console.log("\nSummary:");
-    console.log(summary);
+
+    // console.log(`Scope:${scope}`);
+    // console.log(`Type:${type}`);
+    // console.log("\nSummary:");
+    // console.log(summary);
 
     console.log(chalk.green("\nSuggested Commit Message:"));
     console.log(commitMessage);
 
-    const finalMessage = await confirmCommit(commitMessage);
+    let finalMessage: string;
 
-    if (!finalMessage) {
-    console.log("Commit cancelled.");
-    process.exit(0);
+    if (options.auto) {
+        finalMessage = commitMessage;
+    } else {
+        const result = await confirmCommit(commitMessage);
+
+        if (!result) {
+            console.log("Commit cancelled.");
+            process.exit(0);
+        }
+
+        finalMessage = result;
     }
 
     await commit(finalMessage);
-    console.log("Commit successful.");
 
 
-}
+
+
+}// test change
