@@ -71,8 +71,8 @@ export async function run(options:any){
     // console.log("\nSummary:");
     // console.log(summary);
 
-    console.log(chalk.green("\nSuggested Commit Message:"));
-    console.log(commitMessage);
+    // console.log(chalk.green("\nSuggested Commit Message:"));
+    console.log("\n" + commitMessage + "\n");
 
     let finalMessage: string;
 
@@ -95,5 +95,7 @@ export async function run(options:any){
 
 
 }// test change
+// test change
+// test change
 // test change
 // test change
