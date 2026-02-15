@@ -27,13 +27,13 @@ Writing clear, descriptive commit messages is essential for collaboration and pr
 To generate a commit message for your staged changes, run:
 
 ```sh
-smartcommit
+gitbun
 ```
 
 You can also use it directly with npx:
 
 ```sh
-npx smartcommit
+npx gitbun
 ```
 
 ### Flags
@@ -46,13 +46,13 @@ npx smartcommit
 
 ## AI Mode Explanation
 
-When AI mode is enabled, SmartCommit uses a local or remote LLM (Large Language Model) to:
+When AI mode is enabled, Gitbun uses a local or remote LLM (Large Language Model) to:
 - Analyze your staged diffs
 - Detect the scope and type of changes
 - Summarize intent and impact
 - Generate a clear, conventional commit message
 
-If AI mode is disabled, SmartCommit falls back to a rule-based summarizer for basic commit messages.
+If AI mode is disabled, Gitbun falls back to a rule-based summarizer for basic commit messages.
 
 ## Requirements
 
