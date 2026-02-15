@@ -15,6 +15,7 @@ import { loadConfig } from "./config/loadConfig";
 import { isOllamaRunning } from "./llm/checkOllama";
 
 export async function run(options: any) {
+  // Ensure we are inside a Git repo
   const repo = await isGitRepo();
   if (!repo) {
     console.log(chalk.red("Not inside a Git repository."));
@@ -29,6 +30,7 @@ export async function run(options: any) {
     process.exit(0);
   }
 
+  // Enrich file stats
   const enrichedFiles = [];
 
   for (const file of stagedFiles) {
@@ -47,12 +49,15 @@ export async function run(options: any) {
 
   let commitMessage = generateCommitMessage(type, scope, enrichedFiles);
 
+  // Load config
   const config = await loadConfig();
 
   const model =
     options.model ||
     config.model ||
     "deepseek-coder:6.7b";
+
+  // AI enhancement (optional)
   if (options.ai) {
     const running = await isOllamaRunning();
 
@@ -76,8 +81,7 @@ export async function run(options: any) {
     }
   }
 
-  console.log("\n" + commitMessage + "\n");
-
+  // Confirmation flow
   let finalMessage: string;
 
   if (options.auto) {
@@ -93,6 +97,8 @@ export async function run(options: any) {
     finalMessage = result;
   }
 
-  await commit(finalMessage);
+  // Perform commit (git-native output)
+  const output = await commit(finalMessage);
+
+  console.log("\n" + output);
 }
-// test change

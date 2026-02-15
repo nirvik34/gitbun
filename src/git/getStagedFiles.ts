@@ -9,6 +9,6 @@ export async function getStagedFiles() {
 }
 function getStatusType(status: any,file: string): string{
     if(status.created.includes(file)) return "A";
-    if(status.deleted.icnludes(file)) return "D";
+    if(status.deleted.includes(file)) return "D";
     return "M";
 }

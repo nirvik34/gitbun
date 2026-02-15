@@ -1,0 +1,11 @@
+f additions >> deletions → likely feat
+
+If small modification → fix
+
+If many deletions → refactor
+
+If file name contains test → test
+
+If file contains .md → docs
+
+If lockfile → chore

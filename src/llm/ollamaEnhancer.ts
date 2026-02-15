@@ -1,22 +1,27 @@
 import fetch from "node-fetch";
 
 type OllamaResponse = {
-  response: string;
+  response?: string;
+  error?: string;
 };
 
 export async function enhanceCommit(
   originalMessage: string,
-  summary: string
+  summary: string,
+  model: string
 ): Promise<string> {
   const prompt = `
 You are a senior software engineer.
 
-Improve the description of this Conventional Commit message.
-Do NOT change the type or scope.
-Keep it under 72 characters.
-Return only the improved commit message.
+Rewrite ONLY the description part of this Conventional Commit.
+Do NOT add explanations.
+Do NOT add prefixes like "Improved:".
+Return exactly one single-line commit message.
+Keep format: <type>(<scope>): <description>
+Max 72 characters.
+Description must start lowercase.
 
-Original:
+Original commit:
 ${originalMessage}
 
 Changes:
@@ -28,7 +33,7 @@ ${summary}
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "llama3",
+        model: model,   // ✅ now dynamic
         prompt,
         stream: false
       })
@@ -36,9 +41,38 @@ ${summary}
 
     const data = (await response.json()) as OllamaResponse;
 
-    return data.response.trim();
-  } catch {
+    // Handle model-not-found or API errors
+    if (data.error) {
+      console.log(`Ollama error: ${data.error}`);
+      return originalMessage;
+    }
+
+    if (!data.response) {
+      console.log("AI returned unexpected format:", data);
+      return originalMessage;
+    }
+
+    let result = data.response.trim();
+
+    // Remove common LLM prefixes
+    result = result.replace(/^Improved:\s*/i, "");
+    result = result.replace(/^Here.*:\s*/i, "");
+
+    // Convert past tense to imperative
+    result = result.replace(/\bupdated\b/i, "update");
+    result = result.replace(/\badded\b/i, "add");
+    result = result.replace(/\bfixed\b/i, "fix");
+    result = result.replace(/\bremoved\b/i, "remove");
+
+    // Take only first line
+    result = result.split("\n")[0];
+
+    // Remove trailing period
+    result = result.replace(/\.$/, "");
+
+    return result;
+  } catch (error) {
+    console.log("AI Enhancement Failed:", error);
     return originalMessage;
   }
 }
-
