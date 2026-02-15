@@ -1,101 +1,98 @@
-import chalk from 'chalk';
-import {isGitRepo} from "./git/checkRepo";
-import {getStagedFiles} from "./git/getStagedFiles";
-import {getDiffStats} from "./git/getDiffStats";
-import {detectScope} from "./analyzer/scopeDetector";
-import { classifyCommitType } from './analyzer/typeClassifier';
-import { generateSummary } from './analyzer/summarizer';
+import chalk from "chalk";
+import ora from "ora";
+
+import { isGitRepo } from "./git/checkRepo";
+import { getStagedFiles } from "./git/getStagedFiles";
+import { getDiffStats } from "./git/getDiffStats";
+import { detectScope } from "./analyzer/scopeDetector";
+import { classifyCommitType } from "./analyzer/typeClassifier";
+import { generateSummary } from "./analyzer/summarizer";
 import { generateCommitMessage } from "./generator/commitGenerator";
 import { confirmCommit } from "./ui/interactive";
 import { commit } from "./git/commit";
 import { enhanceCommit } from "./llm/ollamaEnhancer";
+import { loadConfig } from "./config/loadConfig";
+import { isOllamaRunning } from "./llm/checkOllama";
 
-export async function run(options:any){
-    const repo = await isGitRepo();
-    if(!repo){
-        console.log(chalk.red("Not inside a Git repository."));
-        process.exit();
-    }
-    let stagedFiles = await getStagedFiles();
+export async function run(options: any) {
+  const repo = await isGitRepo();
+  if (!repo) {
+    console.log(chalk.red("Not inside a Git repository."));
+    process.exit(1);
+  }
 
-    stagedFiles = stagedFiles.filter(file => {
-        return(
-            !file.path.startsWith("node_modules/") &&
-            !file.path.startsWith("dist/") &&
-            !file.path.startsWith("build/") &&
-            !file.path.startsWith("vendor/")&&
-            !file.path.endsWith(".lock") &&
-            !file.path.endsWith(".log") &&
-            !file.path.endsWith(".tmp") &&
-            !file.path.endsWith(".bak")&&
-            !file.path.startsWith(".git/")&&
-            !file.path.startsWith(".github/")&&
-            !file.path.startsWith(".vscode/")&&
-            !file.path.startsWith(".git/") &&
-            !file.path.endsWith("package-lock.json") &&
-            !file.path.endsWith("yarn.lock")
+  const stagedFiles = await getStagedFiles();
 
-        )
-    })
-    if(stagedFiles.length == 0){
-        console.log(chalk.yellow("No staged changes found."));
-        console.log("Stage changes using: git add <file>");
-        process.exit(0);
-    }
-    console.log(chalk.blue("Analyzing staged changes...\n"));
-    const enrichedFiles = [];
-    for(const file of stagedFiles){
-        const stats = await getDiffStats(file.path);
+  if (stagedFiles.length === 0) {
+    console.log(chalk.yellow("No staged changes found."));
+    console.log("Stage changes using: git add <file>");
+    process.exit(0);
+  }
 
-        enrichedFiles.push({
-            path: file.path,
-            additions:stats.additions,
-            deletions: stats.deletions
-        });
-    }
-    const scope = detectScope(enrichedFiles.map(f => f.path));
-    const type = classifyCommitType(enrichedFiles);
-    const summary = generateSummary(enrichedFiles);
-    let commitMessage = generateCommitMessage(type, scope, enrichedFiles);
+  const enrichedFiles = [];
 
-    if (options.ai) {
-    console.log("\nEnhancing with AI...");
-    commitMessage = await enhanceCommit(commitMessage, summary);
-    }
+  for (const file of stagedFiles) {
+    const stats = await getDiffStats(file.path);
 
+    enrichedFiles.push({
+      path: file.path,
+      additions: stats.additions,
+      deletions: stats.deletions
+    });
+  }
 
+  const scope = detectScope(enrichedFiles.map(f => f.path));
+  const type = classifyCommitType(enrichedFiles);
+  const summary = generateSummary(enrichedFiles);
 
+  let commitMessage = generateCommitMessage(type, scope, enrichedFiles);
 
-    // console.log(`Scope:${scope}`);
-    // console.log(`Type:${type}`);
-    // console.log("\nSummary:");
-    // console.log(summary);
+  const config = await loadConfig();
 
-    // console.log(chalk.green("\nSuggested Commit Message:"));
-    console.log("\n" + commitMessage + "\n");
+  const model =
+    options.model ||
+    config.model ||
+    "deepseek-coder:6.7b";
+  if (options.ai) {
+    const running = await isOllamaRunning();
 
-    let finalMessage: string;
-
-    if (options.auto) {
-        finalMessage = commitMessage;
+    if (!running) {
+      console.log(
+        chalk.yellow("Ollama is not running. Using rule-based commit.")
+      );
     } else {
-        const result = await confirmCommit(commitMessage);
+      const spinner = ora("Enhancing commit with AI...").start();
 
-        if (!result) {
-            console.log("Commit cancelled.");
-            process.exit(0);
-        }
+      try {
+        commitMessage = await enhanceCommit(
+          commitMessage,
+          summary,
+          model
+        );
+        spinner.succeed();
+      } catch {
+        spinner.fail("AI enhancement failed");
+      }
+    }
+  }
 
-        finalMessage = result;
+  console.log("\n" + commitMessage + "\n");
+
+  let finalMessage: string;
+
+  if (options.auto) {
+    finalMessage = commitMessage;
+  } else {
+    const result = await confirmCommit(commitMessage);
+
+    if (!result) {
+      console.log("Commit cancelled.");
+      process.exit(0);
     }
 
-    await commit(finalMessage);
+    finalMessage = result;
+  }
 
-
-
-
-}// test change
-// test change
-// test change
-// test change
+  await commit(finalMessage);
+}
 // test change
