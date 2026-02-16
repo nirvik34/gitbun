@@ -2,7 +2,7 @@ import simpleGit from "simple-git";
 
 export async function getDiffStats(filePath: string) {
   const git = simpleGit();
-  const diff = await git.diff(["--cached", "--numstat", filePath]);
+  const diff = await git.diff(["--cached", "--numstat","--" ,filePath]);
 
   if (!diff.trim()) {
     return { additions: 0, deletions: 0 };

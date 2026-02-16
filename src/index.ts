@@ -35,16 +35,16 @@ export async function run(options: any) {
 
   for (const file of stagedFiles) {
     const stats = await getDiffStats(file.path);
-
     enrichedFiles.push({
       path: file.path,
       additions: stats.additions,
-      deletions: stats.deletions
+      deletions: stats.deletions,
+      status: file.status
     });
   }
 
   const scope = detectScope(enrichedFiles.map(f => f.path));
-  const type = classifyCommitType(enrichedFiles);
+  const type = await classifyCommitType(enrichedFiles);
   const summary = generateSummary(enrichedFiles);
 
   let commitMessage = generateCommitMessage(type, scope, enrichedFiles);

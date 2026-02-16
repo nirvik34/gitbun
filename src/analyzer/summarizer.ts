@@ -1,7 +1,8 @@
 type FileInfo = {
-    path:string;
+    path: string;
     additions: number;
     deletions: number;
+    status: "A" | "M" | "D";
 }
 
 export function generateSummary(files: FileInfo[]): string{
