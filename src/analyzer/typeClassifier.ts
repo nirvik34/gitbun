@@ -9,30 +9,49 @@ type FileInfo = {
 };
 
 export async function classifyCommitType(files: FileInfo[]): Promise<string> {
-    // Docs-only override
-    const allDocs = files.every(f =>
-      f.path.endsWith(".md") ||
-      f.path.toLowerCase().includes("readme") ||
-      f.path.toLowerCase().includes("docs")
-    );
-    if (allDocs) return "docs";
+  // Helper functions must be declared first
+  const isDocs = (path: string) =>
+    path.endsWith(".md") ||
+    path.endsWith(".rst") ||
+    path.endsWith(".adoc") ||
+    path.toLowerCase().includes("readme") ||
+    path.toLowerCase().includes("docs");
 
-    // Test-only override
-    const allTests = files.every(f =>
-      f.path.includes("test") ||
-      f.path.endsWith(".test.js") ||
-      f.path.endsWith(".spec.js")
-    );
-    if (allTests) return "test";
+  const isTest = (path: string) =>
+    path.includes("test") ||
+    path.includes("__tests__") ||
+    path.endsWith("_test.go") ||
+    path.endsWith("Test.java") ||
+    path.startsWith("test_") ||
+    path.endsWith(".spec.ts") ||
+    path.endsWith(".test.ts") ||
+    path.endsWith(".test.js") ||
+    path.endsWith(".spec.js");
 
-    // Mixed docs + tests override
-    const onlyDocsAndTests = files.every(f =>
-      isDocs(f.path) || isTest(f.path)
-    );
-    if (onlyDocsAndTests) {
-      if (files.some(f => isTest(f.path))) return "test";
-      return "docs";
-    }
+  // Docs-only override
+  const allDocs = files.every(f =>
+    f.path.endsWith(".md") ||
+    f.path.toLowerCase().includes("readme") ||
+    f.path.toLowerCase().includes("docs")
+  );
+  if (allDocs) return "docs";
+
+  // Test-only override
+  const allTests = files.every(f =>
+    f.path.includes("test") ||
+    f.path.endsWith(".test.js") ||
+    f.path.endsWith(".spec.js")
+  );
+  if (allTests) return "test";
+
+  // Mixed docs + tests override
+  const onlyDocsAndTests = files.every(f =>
+    isDocs(f.path) || isTest(f.path)
+  );
+  if (onlyDocsAndTests) {
+    if (files.some(f => isTest(f.path))) return "test";
+    return "docs";
+  }
   const score: Record<string, number> = {
     feat: 0,
     fix: 0,
@@ -60,22 +79,6 @@ export async function classifyCommitType(files: FileInfo[]): Promise<string> {
   let totalAdd = 0;
   let totalDel = 0;
   let fileCount = files.length;
-
-  const isDocs = (path: string) =>
-    path.endsWith(".md") ||
-    path.endsWith(".rst") ||
-    path.endsWith(".adoc") ||
-    path.toLowerCase().includes("readme") ||
-    path.toLowerCase().includes("docs");
-
-  const isTest = (path: string) =>
-    path.includes("test") ||
-    path.includes("__tests__") ||
-    path.endsWith("_test.go") ||
-    path.endsWith("Test.java") ||
-    path.startsWith("test_") ||
-    path.endsWith(".spec.ts") ||
-    path.endsWith(".test.ts");
 
   const isCI = (path: string) =>
     path.includes(".github/workflows") ||
