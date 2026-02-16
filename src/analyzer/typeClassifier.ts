@@ -9,6 +9,30 @@ type FileInfo = {
 };
 
 export async function classifyCommitType(files: FileInfo[]): Promise<string> {
+    // Docs-only override
+    const allDocs = files.every(f =>
+      f.path.endsWith(".md") ||
+      f.path.toLowerCase().includes("readme") ||
+      f.path.toLowerCase().includes("docs")
+    );
+    if (allDocs) return "docs";
+
+    // Test-only override
+    const allTests = files.every(f =>
+      f.path.includes("test") ||
+      f.path.endsWith(".test.js") ||
+      f.path.endsWith(".spec.js")
+    );
+    if (allTests) return "test";
+
+    // Mixed docs + tests override
+    const onlyDocsAndTests = files.every(f =>
+      isDocs(f.path) || isTest(f.path)
+    );
+    if (onlyDocsAndTests) {
+      if (files.some(f => isTest(f.path))) return "test";
+      return "docs";
+    }
   const score: Record<string, number> = {
     feat: 0,
     fix: 0,
@@ -110,9 +134,11 @@ export async function classifyCommitType(files: FileInfo[]): Promise<string> {
 
   if (fileCount > 6) score.chore += 1;
 
-  score.fix += 1;
+  // Remove default fix bias
 
-  const sorted = Object.entries(score).sort((a, b) => b[1] - a[1]);
+  const sorted = Object.entries(score)
+    .filter(([, value]) => value > 0)
+    .sort((a, b) => b[1] - a[1]);
 
-  return sorted[0][0];
+  return sorted.length ? sorted[0][0] : "chore";
 }
