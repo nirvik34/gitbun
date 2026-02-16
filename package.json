@@ -1,6 +1,6 @@
 {
   "name": "gitbun",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "A comfy git commit assistant with optional AI enhancement",
   "main": "dist/src/index.js",
   "types": "dist/index.d.ts",
