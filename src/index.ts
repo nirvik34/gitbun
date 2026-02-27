@@ -12,7 +12,7 @@ import { confirmCommit } from "./ui/interactive";
 import { commit } from "./git/commit";
 import { enhanceCommit } from "./llm/ollamaEnhancer";
 import { loadConfig } from "./config/loadConfig";
-import { isOllamaRunning } from "./llm/checkOllama";
+import { isOllamaRunning, getBestModel } from "./llm/checkOllama";
 
 interface CliOptions {
   ai?: boolean;
@@ -59,11 +59,6 @@ export async function run(options: CliOptions) {
   // Load config
   const config = await loadConfig();
 
-  const model =
-    options.model ||
-    config.model ||
-    "deepseek-coder:6.7b";
-
   // AI enhancement (optional)
   if (options.ai) {
     const running = await isOllamaRunning();
@@ -73,13 +68,19 @@ export async function run(options: CliOptions) {
         chalk.yellow("Ollama is not running. Using rule-based commit.")
       );
     } else {
-      const spinner = ora("Enhancing commit with AI...").start();
+      let selectedModel = options.model || config.model;
+
+      if (!selectedModel) {
+        selectedModel = (await getBestModel()) || "deepseek-coder:6.7b";
+      }
+
+      const spinner = ora(`Enhancing commit with AI (${selectedModel})...`).start();
 
       try {
         commitMessage = await enhanceCommit(
           commitMessage,
           summary,
-          model
+          selectedModel
         );
         spinner.succeed();
       } catch {

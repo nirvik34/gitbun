@@ -1,3 +1,25 @@
 add ci.cd pipeline
 add unit test cases
 add dry run output
+
+
+. 🧠 Enhance the AI Generator
+I noticed in 
+src/index.ts
+ that you are using deepseek-coder:6.7b as the default model. You could:
+
+Add a System Prompt: Refine the prompt sent to Ollama in 
+src/llm/ollamaEnhancer.ts
+ to ensure it always follows Conventional Commits.
+Local Model Detection: Add a feature that checks which models the user has available in Ollama (ollama list) and suggests the best one.
+3. 🎨 Build the Frontend Dashboard
+Your frontend/ directory has a Next.js app, but it seems separate from the CLI. You could:
+
+Commit History Visualizer: Make the frontend read the local git history and display AI-generated summaries of past work.
+Web-based Configurator: Create a UI to manage .gitbunrc settings visually.
+4. 🧪 Expand Test Coverage
+Since we just set up Vitest, you could add tests for:
+
+typeClassifier.ts
+: Ensure it correctly identifies feat, fix, etc., based on file changes.
+commitGenerator.ts: Ensure the string formatting is correct.

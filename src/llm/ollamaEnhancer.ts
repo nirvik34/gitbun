@@ -1,78 +1,69 @@
 import fetch from "node-fetch";
 
-type OllamaResponse = {
-  response?: string;
+type OllamaChatResponse = {
+  message?: {
+    content: string;
+  };
   error?: string;
 };
+
+const SYSTEM_PROMPT = `You are a senior developer who writes perfect conventional commits.
+Your task is to refine the description of a commit message while keeping its type and scope.
+Follow these rules strictly:
+1. Return ONLY the commit message line. No explanations.
+2. Use the format: <type>(<scope>): <description>
+3. The description must be in the IMPERATIVE mood (e.g., "add" instead of "added").
+4. Description must start with a lowercase letter.
+5. Do NOT include a trailing period.
+6. Max length 72 characters.
+7. If the original message is already excellent, return it as is.`;
 
 export async function enhanceCommit(
   originalMessage: string,
   summary: string,
   model: string
 ): Promise<string> {
-  const prompt = `
-You are a senior software engineer.
+  const userPrompt = `Refine this commit message:
+Original: ${originalMessage}
 
-Rewrite ONLY the description part of this Conventional Commit.
-Do NOT add explanations.
-Do NOT add prefixes like "Improved:".
-Return exactly one single-line commit message.
-Keep format: <type>(<scope>): <description>
-Max 72 characters.
-Description must start lowercase.
-
-Original commit:
-${originalMessage}
-
-Changes:
-${summary}
-`;
+Context of changes:
+${summary}`;
 
   try {
-    const response = await fetch("http://localhost:11434/api/generate", {
+    const response = await fetch("http://localhost:11434/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: model,   // ✅ now dynamic
-        prompt,
+        model: model,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: userPrompt }
+        ],
         stream: false
       })
     });
 
-    const data = (await response.json()) as OllamaResponse;
+    const data = (await response.json()) as OllamaChatResponse;
 
-    // Handle model-not-found or API errors
     if (data.error) {
-      console.log(`Ollama error: ${data.error}`);
+      console.log(`\nOllama error: ${data.error}`);
       return originalMessage;
     }
 
-    if (!data.response) {
-      console.log("AI returned unexpected format:", data);
+    if (!data.message?.content) {
       return originalMessage;
     }
 
-    let result = data.response.trim();
+    let result = data.message.content.trim();
 
-    // Remove common LLM prefixes
-    result = result.replace(/^Improved:\s*/i, "");
-    result = result.replace(/^Here.*:\s*/i, "");
-
-    // Convert past tense to imperative
-    result = result.replace(/\bupdated\b/i, "update");
-    result = result.replace(/\badded\b/i, "add");
-    result = result.replace(/\bfixed\b/i, "fix");
-    result = result.replace(/\bremoved\b/i, "remove");
-
-    // Take only first line
+    // Clean up common LLM artifacts in case it ignores system prompt
+    result = result.replace(/^[`"']|[`"']$/g, ""); // remove quotes or backticks
+    result = result.replace(/^commit:\s*/i, "");
     result = result.split("\n")[0];
-
-    // Remove trailing period
-    result = result.replace(/\.$/, "");
 
     return result;
   } catch (error) {
-    console.log("AI Enhancement Failed:", error);
+    console.log("\nAI Enhancement Failed:", error);
     return originalMessage;
   }
 }
