@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/nirvik34/gitbun/compare/v1.2.0...v1.2.1) (2026-02-27)
+
+
+### Bug Fixes
+
+* **frontend:** upgrade next.js to 15.1.12 to resolve CVE-2025-66478 ([7ff50b0](https://github.com/nirvik34/gitbun/commit/7ff50b02f365c6d0013a0632ba111ff110a40eeb))
+
 # [1.2.0](https://github.com/nirvik34/gitbun/compare/v1.1.0...v1.2.0) (2026-02-27)
 
 
