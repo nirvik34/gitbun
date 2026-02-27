@@ -15,7 +15,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "ts-node bin/smartcommit.ts",
-    "start": "node dist/bin/smartcommit.js"
+    "start": "node dist/bin/smartcommit.js",
+    "test": "vitest run",
+    "lint": "eslint"
   },
   "keywords": [
     "git",
@@ -39,9 +41,15 @@
     "simple-git": "^3.31.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^25.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "eslint": "^10.0.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1",
+    "vitest": "^4.0.18"
   },
   "repository": {
     "type": "git",

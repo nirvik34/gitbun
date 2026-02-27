@@ -78,7 +78,7 @@ export async function classifyCommitType(files: FileInfo[]): Promise<string> {
 
   let totalAdd = 0;
   let totalDel = 0;
-  let fileCount = files.length;
+  const fileCount = files.length;
 
   const isCI = (path: string) =>
     path.includes(".github/workflows") ||

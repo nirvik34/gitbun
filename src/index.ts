@@ -14,7 +14,14 @@ import { enhanceCommit } from "./llm/ollamaEnhancer";
 import { loadConfig } from "./config/loadConfig";
 import { isOllamaRunning } from "./llm/checkOllama";
 
-export async function run(options: any) {
+interface CliOptions {
+  ai?: boolean;
+  model?: string;
+  auto?: boolean;
+  [key: string]: unknown;
+}
+
+export async function run(options: CliOptions) {
   // Ensure we are inside a Git repo
   const repo = await isGitRepo();
   if (!repo) {

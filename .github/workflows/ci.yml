@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # Job 1: Build and Verify CLI (Root)
+  cli-check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+        
+      # Note: Ensure eslint/vitest are added to package.json to avoid failure here
+      - name: Run Linter
+        run: npm run lint
+        
+      - name: Run Tests
+        run: npm test
+        
+      - name: Build project
+        run: npm run build
+
+  # Job 2: Build and Verify Frontend
+  frontend-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install Frontend dependencies
+        run: cd frontend && npm ci
+        
+      - name: Lint Frontend
+        run: cd frontend && npm run lint
+        
+      - name: Build Frontend
+        run: cd frontend && npm run build
