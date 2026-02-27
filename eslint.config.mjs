@@ -5,7 +5,7 @@ export default tseslint.config(
     eslint.configs.recommended,
     ...tseslint.configs.recommended,
     {
-        ignores: ['dist/', 'node_modules/', 'frontend/', 'docs/', 'eslint.config.mjs'],
+        ignores: ['dist/', 'node_modules/', 'frontend/', 'docs/', 'eslint.config.mjs', 'vitest.config.ts'],
     },
     {
         languageOptions: {
