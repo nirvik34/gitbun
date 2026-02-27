@@ -12,10 +12,13 @@ jobs:
       issues: write
       pull-requests: write
       id-token: write
+    env:
+      HUSKY: 0          # Disable husky git hooks in CI
+      NODE_ENV: development  # Ensure devDependencies are installed
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Required for semantic-release
+          fetch-depth: 0 # Required for semantic-release to walk commit history
 
       - name: Use Node.js 20
         uses: actions/setup-node@v4
@@ -24,7 +27,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --include=dev
+        run: npm ci
+
+      - name: Debug - check semantic-release binary
+        run: ls node_modules/.bin/semantic-release && echo "Found!" || echo "NOT FOUND"
 
       - name: Run Lint
         run: npm run lint
@@ -39,4 +45,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm exec --no -- semantic-release
+        run: node_modules/.bin/semantic-release
