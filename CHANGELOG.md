@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/nirvik34/gitbun/compare/v1.1.0...v1.2.0) (2026-02-27)
+
+
+### Features
+
+* **frontend:** implement sleek dark minimal landing page design with interactive features ([4ddcbbf](https://github.com/nirvik34/gitbun/commit/4ddcbbf72a25f4fdb77092d5830f85badffcae8e))
+
 # [1.1.0](https://github.com/nirvik34/gitbun/compare/v1.0.0...v1.1.0) (2026-02-27)
 
 
