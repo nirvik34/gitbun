@@ -23,3 +23,7 @@ Since we just set up Vitest, you could add tests for:
 typeClassifier.ts
 : Ensure it correctly identifies feat, fix, etc., based on file changes.
 commitGenerator.ts: Ensure the string formatting is correct.
+
+5. 🛡 Security and Hygiene
+- Added Husky for pre-commit hooks.
+- Added Commitlint to enforce conventional commits.
