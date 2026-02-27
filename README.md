@@ -1,4 +1,4 @@
-# 🐰 Gitbun
+# Gitbun
 
 [![npm version](https://img.shields.io/npm/v/gitbun.svg?style=flat-square)](https://www.npmjs.com/package/gitbun)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/nirvik34/gitbun/release.yml?branch=main&style=flat-square)](https://github.com/nirvik34/gitbun/actions)
@@ -11,18 +11,18 @@ No more `feat: update code` or `fix: fix bug`. Gitbun understands your diffs.
 
 ---
 
-## ✨ Features
+## Features
 
-- 🧠 **AI-Powered**: Leverages local LLMs (via Ollama) or remote APIs to write human-like commit descriptions.
-- 🏗 **Conventional Commits**: Automatically detects the correct `type` (feat, fix, refactor, etc.) and `scope` based on your file structure.
-- 🛡 **Smart Fallback**: If the AI is offline, Gitbun uses a robust rule-based engine to generate structured messages.
-- 💬 **Interactive Mode**: Review, edit, or regenerate suggestions before committing.
-- ⚙️ **Highly Configurable**: Works out-of-the-box, but stays customizable via `.smartcommitrc` or `package.json`.
-- 🔒 **Privacy First**: With local AI support, your code analysis never leaves your machine.
+- **AI-Powered**: Leverages local LLMs (via Ollama) or remote APIs to write human-like commit descriptions.
+- **Conventional Commits**: Automatically detects the correct `type` (feat, fix, refactor, etc.) and `scope` based on your file structure.
+- **Smart Fallback**: If the AI is offline, Gitbun uses a robust rule-based engine to generate structured messages.
+- **Interactive Mode**: Review, edit, or regenerate suggestions before committing.
+- **Highly Configurable**: Works out-of-the-box, but stays customizable via `.smartcommitrc` or `package.json`.
+- **Privacy First**: With local AI support, your code analysis never leaves your machine.
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 Generate a perfect commit message for your staged changes:
 
@@ -36,7 +36,7 @@ npx gitbun
 
 ---
 
-## 📦 Installation
+## Installation
 
 Install globally for the best experience:
 
@@ -48,7 +48,7 @@ Then simply type `gitbun` in any repository.
 
 ---
 
-## 📖 Usage & Flags
+## Usage & Flags
 
 | Flag | Shortcut | Description |
 |---|---|---|
@@ -62,7 +62,7 @@ Then simply type `gitbun` in any repository.
 
 ---
 
-## 🧠 Local AI Setup (Ollama)
+## Local AI Setup (Ollama)
 
 To get the most out of Gitbun without sending data to the cloud, use it with [Ollama](https://ollama.ai/):
 
@@ -75,7 +75,7 @@ To get the most out of Gitbun without sending data to the cloud, use it with [Ol
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 Gitbun uses [Cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to find settings. You can add a `smartcommit` block to your `package.json` or create a `.smartcommitrc` file.
 
@@ -90,7 +90,7 @@ Gitbun uses [Cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to find se
 
 ---
 
-## 🛡 Fallback & Rule-Based Logic
+## Fallback & Rule-Based Logic
 
 When AI is unavailable, Gitbun falls back to a deterministic summarization engine. 
 
@@ -105,7 +105,7 @@ When AI is unavailable, Gitbun falls back to a deterministic summarization engin
 
 ---
 
-## 🧪 Examples & Screenshots
+## Examples & Screenshots
 
 ### AI Enhancement Mode
 **Staged Diff:**
@@ -123,7 +123,7 @@ When AI is unavailable, Gitbun falls back to a deterministic summarization engin
 
 ---
 
-## 🛠 CI/CD Integration
+## CI/CD Integration
 
 Gitbun can be used in CI/CD pipelines using the `--auto` flag.
 
@@ -142,10 +142,10 @@ jobs:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! See the [docs/](docs/) for more details on project architecture.
 
-## 📄 License
+## License
 
 MIT © [Nirvik Goswami](https://github.com/nirvik34)
