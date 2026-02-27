@@ -1,112 +1,73 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { C } from "@/styles/palette";
-
-interface NavProps {
-  activeSection: string;
-  setActiveSection: (s: string) => void;
-}
-
-export default function Nav({ activeSection, setActiveSection }: NavProps) {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", fn);
-    return () => window.removeEventListener("scroll", fn);
-  }, []);
-
-  const navLinks = ["playground", "docs", "github"];
+export default function Nav() {
+  const copyInstall = () => {
+    navigator.clipboard.writeText("npm install -g gitbun");
+  };
 
   return (
     <nav style={{
-      position:       "fixed",
-      top:            0,
-      left:           0,
-      right:          0,
-      zIndex:         100,
-      padding:        "0 2.5rem",
-      height:         "58px",
-      display:        "flex",
-      alignItems:     "center",
+      display: "flex",
+      alignItems: "center",
       justifyContent: "space-between",
-      background:     scrolled ? "rgba(239,236,227,0.94)" : "transparent",
-      backdropFilter: scrolled ? "blur(14px)" : "none",
-      borderBottom:   scrolled ? `1px solid ${C.creamDeep}` : "none",
-      transition:     "all 0.3s ease",
-      fontFamily:     "'JetBrains Mono', monospace",
+      padding: "24px 32px",
+      maxWidth: "1280px",
+      margin: "0 auto",
+      width: "100%",
     }}>
       {/* Logo */}
-      <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
-        <span style={{ color:C.steel, fontSize:"20px" }}>⬡</span>
-        <span style={{ color:C.ink, fontWeight:700, fontSize:"15px", letterSpacing:"0.05em" }}>
-          git<span style={{ color:C.steel }}>bun</span>
-        </span>
-        <span style={{
-          background:    "rgba(74,112,169,0.1)",
-          border:        "1px solid rgba(74,112,169,0.3)",
-          color:         C.steel,
-          fontSize:      "9px",
-          padding:       "2px 7px",
-          borderRadius:  "3px",
-          letterSpacing: "0.1em",
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{
+          width: "32px", height: "32px",
+          background: "#fff",
+          borderRadius: "8px",
+          display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          v1.0
-        </span>
+          <span className="material-symbols-outlined" style={{ color: "#000", fontSize: "18px" }}>terminal</span>
+        </div>
+        <span style={{ fontWeight: 700, fontSize: "18px", letterSpacing: "-0.02em" }}>gitbun</span>
       </div>
 
       {/* Links */}
-      <div style={{ display:"flex", gap:"2rem", alignItems:"center" }}>
-        {navLinks.map(s => (
-          <button
-            key={s}
-            onClick={() => {
-              setActiveSection(s);
-              document.getElementById(s)?.scrollIntoView({ behavior: "smooth" });
-            }}
-            style={{
-              background:    "none",
-              border:        "none",
-              cursor:        "pointer",
-              color:         activeSection === s ? C.steel : C.inkMid,
-              fontSize:      "11px",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              padding:       "4px 0",
-              fontFamily:    "inherit",
-              borderBottom:  activeSection === s ? `2px solid ${C.steel}` : "2px solid transparent",
-              transition:    "all 0.2s",
-            }}
-          >
-            {s}
-          </button>
-        ))}
+      <div style={{ display: "flex", alignItems: "center", gap: "32px", fontSize: "14px", fontWeight: 500, color: "#9ca3af" }}>
+        <a href="https://github.com/nirvik34/gitbun" target="_blank" rel="noreferrer"
+          style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }}
+          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+          onMouseLeave={e => (e.currentTarget.style.color = "#9ca3af")}
+        >Documentation</a>
+        <a href="https://www.npmjs.com/package/gitbun" target="_blank" rel="noreferrer"
+          style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }}
+          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+          onMouseLeave={e => (e.currentTarget.style.color = "#9ca3af")}
+        >Pricing</a>
+        <a href="https://github.com/nirvik34/gitbun/blob/main/CHANGELOG.md" target="_blank" rel="noreferrer"
+          style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }}
+          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+          onMouseLeave={e => (e.currentTarget.style.color = "#9ca3af")}
+        >Changelog</a>
+      </div>
 
-        <a
-          href="https://github.com/nirvik34/gitbun"
-          target="_blank"
-          rel="noreferrer"
+      {/* CTA */}
+      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <a href="https://github.com/nirvik34/gitbun" target="_blank" rel="noreferrer"
+          style={{ fontSize: "14px", fontWeight: 500, color: "#fff", textDecoration: "none", transition: "color 0.2s" }}
+          onMouseEnter={e => (e.currentTarget.style.color = "#9ca3af")}
+          onMouseLeave={e => (e.currentTarget.style.color = "#fff")}
+        >Sign in</a>
+        <button
+          onClick={copyInstall}
           style={{
-            background:    C.steel,
-            color:         C.cream,
-            padding:       "7px 16px",
-            borderRadius:  "4px",
-            fontSize:      "11px",
-            letterSpacing: "0.07em",
-            textDecoration:"none",
-            display:       "flex",
-            alignItems:    "center",
-            gap:           "6px",
-            fontFamily:    "inherit",
-            fontWeight:    600,
-            transition:    "background 0.2s",
+            background: "#fff", color: "#000",
+            padding: "8px 20px", borderRadius: "9999px",
+            fontSize: "14px", fontWeight: 700,
+            border: "none", cursor: "pointer",
+            transition: "background 0.2s",
           }}
-          onMouseEnter={e => (e.currentTarget.style.background = C.steelDark)}
-          onMouseLeave={e => (e.currentTarget.style.background = C.steel)}
+          onMouseEnter={e => (e.currentTarget.style.background = "#e5e7eb")}
+          onMouseLeave={e => (e.currentTarget.style.background = "#fff")}
         >
-          ★ GitHub
-        </a>
+          Install npm package
+        </button>
       </div>
     </nav>
   );

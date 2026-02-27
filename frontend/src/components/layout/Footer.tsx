@@ -1,34 +1,50 @@
-import { C } from "@/styles/palette";
+"use client";
 
 export default function Footer() {
   return (
     <footer style={{
-      borderTop:  `1px solid ${C.creamDeep}`,
-      padding:    "36px 2rem",
-      textAlign:  "center",
-      fontFamily: "'JetBrains Mono', monospace",
-      fontSize:   "12px",
-      color:      C.inkLight,
-      background: C.cream,
+      borderTop: "1px solid rgba(255,255,255,0.05)",
+      padding: "80px 0",
     }}>
-      <div style={{ marginBottom:"12px", display:"flex", justifyContent:"center", gap:"10px", alignItems:"center", flexWrap:"wrap" }}>
-        <span style={{ color:C.steel, fontSize:"16px" }}>⬡</span>
-        <span style={{ color:C.ink }}>
-          git<span style={{ color:C.steel }}>bun</span>
-        </span>
-        <span>·</span>
-        <span>MIT License</span>
-        <span>·</span>
-        <a
-          href="https://github.com/nirvik34/gitbun"
-          target="_blank"
-          rel="noreferrer"
-          style={{ color:C.steel, textDecoration:"none" }}
-        >
-          github.com/nirvik34/gitbun
-        </a>
+      <div style={{
+        maxWidth: "1280px", margin: "0 auto", padding: "0 32px",
+        display: "flex", flexWrap: "wrap", justifyContent: "space-between",
+        alignItems: "center", gap: "40px",
+      }}>
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{
+            width: "24px", height: "24px",
+            background: "rgba(255,255,255,0.1)",
+            borderRadius: "6px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <span className="material-symbols-outlined" style={{ color: "#fff", fontSize: "14px" }}>terminal</span>
+          </div>
+          <span style={{ fontWeight: 700, letterSpacing: "-0.02em" }}>gitbun</span>
+        </div>
+
+        {/* Links */}
+        <div style={{ display: "flex", gap: "48px", fontSize: "14px", color: "#6b7280", fontFamily: "'JetBrains Mono', monospace" }}>
+          {[
+            { label: "GitHub", href: "https://github.com/nirvik34/gitbun" },
+            { label: "npm", href: "https://www.npmjs.com/package/gitbun" },
+            { label: "Discord", href: "#" },
+            { label: "Terms", href: "#" },
+          ].map(link => (
+            <a key={link.label} href={link.href} target="_blank" rel="noreferrer"
+              style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#6b7280")}
+            >{link.label}</a>
+          ))}
+        </div>
+
+        {/* Copyright */}
+        <div style={{ fontSize: "12px", color: "#4b5563", fontFamily: "'JetBrains Mono', monospace" }}>
+          © 2025 Gitbun. All rights reserved.
+        </div>
       </div>
-      <div>Built by nirvik34 — Node.js ≥ 18 required</div>
     </footer>
   );
 }
