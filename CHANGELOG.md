@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/nirvik34/gitbun/compare/v1.2.1...v1.2.2) (2026-02-28)
+
+
+### Bug Fixes
+
+* escape unescaped entities and fix font url warning ([c59dd8e](https://github.com/nirvik34/gitbun/commit/c59dd8eade041ef9b45829390ed448c80ceab391))
+
 ## [1.2.1](https://github.com/nirvik34/gitbun/compare/v1.2.0...v1.2.1) (2026-02-27)
 
 
