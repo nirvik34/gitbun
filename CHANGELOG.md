@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/nirvik34/gitbun/compare/v1.2.2...v1.2.3) (2026-02-28)
+
+
+### Bug Fixes
+
+* trigger release ([91d2c97](https://github.com/nirvik34/gitbun/commit/91d2c97ac8580cf273ff86ebdfb179b47700d90f))
+
 ## [1.2.2](https://github.com/nirvik34/gitbun/compare/v1.2.1...v1.2.2) (2026-02-28)
 
 
