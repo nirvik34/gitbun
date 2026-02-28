@@ -239,17 +239,17 @@ export default function DocsPage() {
                             <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: "12px", padding: "24px", fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", lineHeight: 1.6, marginBottom: "24px" }}>
                                 <pre style={{ margin: 0 }}>
                                     <span style={{ color: "#fff" }}>{`{`}</span>{"\n"}
-                                    {"  "}<span style={{ color: "#60a5fa" }}>"useAI"</span>: <span style={{ color: "#fb923c" }}>true</span>,{"\n"}
-                                    {"  "}<span style={{ color: "#60a5fa" }}>"backend"</span>: <span style={{ color: "#4ade80" }}>"local"</span>,{"\n"}
-                                    {"  "}<span style={{ color: "#60a5fa" }}>"model"</span>: <span style={{ color: "#4ade80" }}>"llama3"</span>,{"\n"}
-                                    {"  "}<span style={{ color: "#60a5fa" }}>"conventional"</span>: <span style={{ color: "#fb923c" }}>true</span>{"\n"}
+                                    {"  "}<span style={{ color: "#60a5fa" }}>&quot;useAI&quot;</span>: <span style={{ color: "#fb923c" }}>true</span>,{"\n"}
+                                    {"  "}<span style={{ color: "#60a5fa" }}>&quot;backend&quot;</span>: <span style={{ color: "#4ade80" }}>&quot;local&quot;</span>,{"\n"}
+                                    {"  "}<span style={{ color: "#60a5fa" }}>&quot;model&quot;</span>: <span style={{ color: "#4ade80" }}>&quot;llama3&quot;</span>,{"\n"}
+                                    {"  "}<span style={{ color: "#60a5fa" }}>&quot;conventional&quot;</span>: <span style={{ color: "#fb923c" }}>true</span>{"\n"}
                                     <span style={{ color: "#fff" }}>{`}`}</span>
                                 </pre>
                             </div>
                             <h3 style={{ fontSize: "18px", fontWeight: 700, marginBottom: "16px", color: "#fff" }}>Environment Variables</h3>
                             <div style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${C.border}`, borderRadius: "8px", padding: "16px", fontFamily: "monospace", fontSize: "13px" }}>
                                 <div style={{ color: C.textDark }}># For remote backends (OpenAI)</div>
-                                <div style={{ color: "#fff" }}>export OPENAI_API_KEY="sk-..."</div>
+                                <div style={{ color: "#fff" }}>export OPENAI_API_KEY=&quot;sk-...&quot;</div>
                             </div>
                         </section>
 
