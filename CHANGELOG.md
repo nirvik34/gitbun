@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/nirvik34/gitbun/compare/v1.2.3...v1.2.4) (2026-02-28)
+
+
+### Bug Fixes
+
+* new npm token ([3e476a3](https://github.com/nirvik34/gitbun/commit/3e476a399cdca3ff19ae37ee1d39e516e7993d6a))
+
 ## [1.2.3](https://github.com/nirvik34/gitbun/compare/v1.2.2...v1.2.3) (2026-02-28)
 
 
