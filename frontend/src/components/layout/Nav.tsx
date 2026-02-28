@@ -51,11 +51,7 @@ export default function Nav() {
 
       {/* CTA */}
       <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <a href="https://github.com/nirvik34/gitbun" target="_blank" rel="noreferrer"
-          style={{ fontSize: "14px", fontWeight: 500, color: "#fff", textDecoration: "none", transition: "color 0.2s" }}
-          onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "#9ca3af")}
-          onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "#fff")}
-        >Sign in</a>
+
         <button
           onClick={copyInstall}
           style={{

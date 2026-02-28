@@ -1,6 +1,48 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
+
+
+
+function ScrollFeature({ text }: { text: string }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsActive(entry.isIntersecting);
+      },
+      {
+        threshold: 0.8,
+        rootMargin: "-10% 0px -10% 0px",
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <p
+      ref={ref}
+      style={{
+        fontSize: "clamp(28px, 4.5vw, 56px)",
+        fontWeight: 700,
+        lineHeight: 1.3,
+        color: isActive ? "#fff" : "#262626",
+        marginBottom: "8px",
+        transition: "color 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+        cursor: "default",
+      }}
+    >
+      {text}
+    </p>
+  );
+}
 
 export default function Hero() {
   const [copied, setCopied] = useState<boolean>(false);
@@ -224,31 +266,13 @@ export default function Hero() {
       <section style={{ padding: "160px 0" }}>
         <div style={{ maxWidth: "900px" }}>
           {[
-            { text: "Intelligent diff analysis for every language.", active: true },
-            { text: "Supports conventional commits by default.", active: false },
-            { text: "Seamless integration with your existing CLI.", active: false },
-            { text: "Privacy first: your code never leaves the session.", active: false },
-            { text: "Customizable prompts for your team's style.", active: false },
-          ].map((item, i) => (
-            <p key={i}
-              style={{
-                fontSize: "clamp(28px, 4.5vw, 56px)",
-                fontWeight: 700,
-                lineHeight: 1.3,
-                color: item.active ? "#fff" : "#262626",
-                marginBottom: "8px",
-                transition: "color 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
-                cursor: "default",
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.color = "#fff";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.color = item.active ? "#fff" : "#262626";
-              }}
-            >
-              {item.text}
-            </p>
+            "Intelligent diff analysis for every language.",
+            "Supports conventional commits by default.",
+            "Seamless integration with your existing CLI.",
+            "Privacy first: your code never leaves the session.",
+            "Customizable prompts for your team's style.",
+          ].map((text, i) => (
+            <ScrollFeature key={i} text={text} />
           ))}
         </div>
       </section>
