@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/nirvik34/gitbun/compare/v1.2.4...v1.3.0) (2026-02-28)
+
+
+### Features
+
+* **components:** add layout and sections ([19aeec4](https://github.com/nirvik34/gitbun/commit/19aeec4ecddca69b5d47cda41cf3d937d8e29e02))
+
 ## [1.2.4](https://github.com/nirvik34/gitbun/compare/v1.2.3...v1.2.4) (2026-02-28)
 
 
