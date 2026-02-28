@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Nav() {
   const copyInstall = () => {
     navigator.clipboard.writeText("npm install -g gitbun");
@@ -30,20 +32,20 @@ export default function Nav() {
 
       {/* Links */}
       <div style={{ display: "flex", alignItems: "center", gap: "32px", fontSize: "14px", fontWeight: 500, color: "#9ca3af" }}>
-        <a href="https://github.com/nirvik34/gitbun" target="_blank" rel="noreferrer"
+        <Link href="/docs"
           style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={e => (e.currentTarget.style.color = "#9ca3af")}
-        >Documentation</a>
+          onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "#fff")}
+          onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "#9ca3af")}
+        >Documentation</Link>
         <a href="https://www.npmjs.com/package/gitbun" target="_blank" rel="noreferrer"
           style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={e => (e.currentTarget.style.color = "#9ca3af")}
+          onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "#fff")}
+          onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "#9ca3af")}
         >Pricing</a>
         <a href="https://github.com/nirvik34/gitbun/blob/main/CHANGELOG.md" target="_blank" rel="noreferrer"
           style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={e => (e.currentTarget.style.color = "#9ca3af")}
+          onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "#fff")}
+          onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "#9ca3af")}
         >Changelog</a>
       </div>
 
@@ -51,8 +53,8 @@ export default function Nav() {
       <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
         <a href="https://github.com/nirvik34/gitbun" target="_blank" rel="noreferrer"
           style={{ fontSize: "14px", fontWeight: 500, color: "#fff", textDecoration: "none", transition: "color 0.2s" }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#9ca3af")}
-          onMouseLeave={e => (e.currentTarget.style.color = "#fff")}
+          onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "#9ca3af")}
+          onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = "#fff")}
         >Sign in</a>
         <button
           onClick={copyInstall}
@@ -63,8 +65,8 @@ export default function Nav() {
             border: "none", cursor: "pointer",
             transition: "background 0.2s",
           }}
-          onMouseEnter={e => (e.currentTarget.style.background = "#e5e7eb")}
-          onMouseLeave={e => (e.currentTarget.style.background = "#fff")}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.background = "#e5e7eb")}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.background = "#fff")}
         >
           Install npm package
         </button>

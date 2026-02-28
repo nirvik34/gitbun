@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer style={{
@@ -27,16 +29,24 @@ export default function Footer() {
         {/* Links */}
         <div style={{ display: "flex", gap: "48px", fontSize: "14px", color: "#6b7280", fontFamily: "'JetBrains Mono', monospace" }}>
           {[
+            { label: "Docs", href: "/docs", internal: true },
             { label: "GitHub", href: "https://github.com/nirvik34/gitbun" },
             { label: "npm", href: "https://www.npmjs.com/package/gitbun" },
-            { label: "Discord", href: "#" },
-            { label: "Terms", href: "#" },
+            { label: "Changelog", href: "https://github.com/nirvik34/gitbun/blob/main/CHANGELOG.md" },
           ].map(link => (
-            <a key={link.label} href={link.href} target="_blank" rel="noreferrer"
-              style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-              onMouseLeave={e => (e.currentTarget.style.color = "#6b7280")}
-            >{link.label}</a>
+            link.internal ? (
+              <Link key={link.label} href={link.href}
+                style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+                onMouseLeave={e => (e.currentTarget.style.color = "#6b7280")}
+              >{link.label}</Link>
+            ) : (
+              <a key={link.label} href={link.href} target="_blank" rel="noreferrer"
+                style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+                onMouseLeave={e => (e.currentTarget.style.color = "#6b7280")}
+              >{link.label}</a>
+            )
           ))}
         </div>
 
