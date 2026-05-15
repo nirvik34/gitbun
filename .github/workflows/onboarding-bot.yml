@@ -15,10 +15,9 @@ jobs:
         uses: actions/first-interaction@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          # Logic: Executes only if this is the user's first issue in nirvik34/gitbun
           issue-message: |
             ##  Welcome to Gitbun! 
-            @${{ github.actor }}, thank you for opening this issue. We appreciate you helping us improve!
+            @${{ github.event.issue.user.login }}, thank you for opening this issue. We appreciate you helping us improve!
 
             **Quick Checklist:**
             - [ ] Have you checked if a similar [issue](https://github.com/nirvik34/gitbun/issues) already exists?
@@ -28,15 +27,16 @@ jobs:
           
 
       - name: "Add Triage Label"
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
+            if (!context.payload.issue) return;
             const response = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               creator: context.payload.issue.user.login,
               state: 'all',
-              per_page: 2 // We only need to know if they have more than 1
+              per_page: 2 
             });
 
             if (response.data.length <= 1) {
