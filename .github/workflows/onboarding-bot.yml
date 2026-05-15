@@ -3,6 +3,7 @@ name: "Contributor Onboarding & Triage"
 on:
   issues:
     types: [opened]
+  workflow_dispatch:
 
 jobs:
   welcome:
