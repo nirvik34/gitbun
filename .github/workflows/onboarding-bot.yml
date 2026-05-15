@@ -12,7 +12,6 @@ jobs:
       issues: write
     steps:
       - name: "First Interaction Triage"
-        id: welcome_step
         uses: actions/first-interaction@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -29,13 +28,22 @@ jobs:
           
 
       - name: "Add Triage Label"
-        if: always()
         uses: actions/github-script@v6
         with:
           script: |
-            github.rest.issues.addLabels({
-              issue_number: context.issue.number,
+            const response = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              labels: ['triage']
-            })
+              creator: context.payload.issue.user.login,
+              state: 'all',
+              per_page: 2 // We only need to know if they have more than 1
+            });
+
+            if (response.data.length <= 1) {
+              await github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ['triage']
+              });
+            }
