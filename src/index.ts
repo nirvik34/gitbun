@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import ora from "ora";
-import * as childProcess from "node:child_process";
+import { execFileSync } from "node:child_process";
 
 import { isGitRepo } from "./git/checkRepo";
 import { getStagedFiles } from "./git/getStagedFiles";
@@ -30,7 +30,7 @@ interface CliOptions {
 
 function getDiffForFile(path: string): string {
   try {
-    return childProcess.execSync(`git diff --cached -U0 -- "${path}"`, {
+    return execFileSync("git", ["diff", "--cached", "-U0", "--", path], {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
     });

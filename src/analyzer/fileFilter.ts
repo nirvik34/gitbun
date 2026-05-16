@@ -1,4 +1,4 @@
-import * as childProcess from "node:child_process";
+import { execFileSync } from "node:child_process";
 
 export type FileChange = {
   path: string;
@@ -65,7 +65,7 @@ export function isFormattingOnlyDiff(diffText: string): boolean {
 
 function getStagedDiffForFile(path: string): string {
   try {
-    return childProcess.execSync(`git diff --cached -U0 -- "${path}"`, {
+    return execFileSync("git", ["diff", "--cached", "-U0", "--", path], {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
     });
