@@ -7,6 +7,15 @@ Fixes # (issue number)
 - [ ] Documentation update
 - [ ] Frontend styling/component update
 
+## GSSoC '26 Contribution Details
+Please select the difficulty level that was assigned to you in the issue:
+- [ ] level:beginner
+- [ ] level:intermediate
+- [ ] level:advanced
+- [ ] level:critical
+
+- [ ] **I have been assigned to this issue by a maintainer.** (PRs without prior assignment will not count toward GSSoC).
+
 ## How Has This Been Tested?
 - [ ] `npm test` passes locally
 - [ ] `npm run lint` passes without errors
