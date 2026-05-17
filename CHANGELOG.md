@@ -1,3 +1,30 @@
+# [1.4.0](https://github.com/nirvik34/gitbun/compare/v1.3.2...v1.4.0) (2026-05-17)
+
+
+### Bug Fixes
+
+* **config:** relax template placeholder validation ([da0d385](https://github.com/nirvik34/gitbun/commit/da0d385c1831be7cc23367034071d93126e3edfe))
+* **config:** validate commit format templates ([64efc33](https://github.com/nirvik34/gitbun/commit/64efc3371bf3f170eadbecde7ce3ef018d3d8cf4))
+
+
+### Features
+
+* **config:** add configurable commit templates ([32d0fe7](https://github.com/nirvik34/gitbun/commit/32d0fe7c8f9d9f003a288ea0c59e2488a13a4c7a))
+
+## [1.3.2](https://github.com/nirvik34/gitbun/compare/v1.3.1...v1.3.2) (2026-05-17)
+
+
+### Bug Fixes
+
+* **llm:** add timeouts to Ollama API calls to prevent CLI freezing ([6f8436c](https://github.com/nirvik34/gitbun/commit/6f8436ca33bcbc027c7e3170152a16e42f7cb1d5))
+
+## [1.3.1](https://github.com/nirvik34/gitbun/compare/v1.3.0...v1.3.1) (2026-05-16)
+
+
+### Bug Fixes
+
+* **core:** fix .coderabbit ([d579a00](https://github.com/nirvik34/gitbun/commit/d579a004c5b4fbb6bb41b8e1dc0bad99c8e18058))
+
 # [1.3.0](https://github.com/nirvik34/gitbun/compare/v1.2.4...v1.3.0) (2026-02-28)
 
 

@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+language: en-US
+early_access: false
+
+reviews:
+  profile: professional
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  collapse_walkthrough: false
+  auto_title_instructions: "Ensure PR titles follow Conventional Commits (feat, fix, chore, docs, etc.)"
+
+  auto_review:
+    enabled: true
+    ignore_title_keywords:
+      - WIP
+      - DRAFT
+      - DO NOT MERGE
+    drafts: false
+
+  path_instructions:
+    - path: "frontend/src/**/*.{ts,tsx}"
+      instructions: |
+        - Review React 19 and Next.js 15 best practices.
+        - Check for proper usage of Server Components vs Client Components.
+        - Ensure Tailwind CSS classes are clean and responsive.
+        - Verify Google Gemini API integration follows safety guidelines.
+    - path: "src/**/*.ts"
+      instructions: |
+        - Review TypeScript logic for the CLI tool.
+        - Ensure `simple-git` operations are handled safely (e.g., checking if repo exists).
+        - Verify configuration loading using `cosmiconfig` follows patterns.
+        - Check for proper error handling and user feedback (chalk/ora).
+    - path: "src/**/*.test.ts"
+      instructions: |
+        - Ensure tests cover edge cases for git operations.
+        - Verify mocks are used appropriately for external APIs (Gemini).
+        - Check that tests are descriptive and follow Vitest patterns.
+    - path: "bin/smartcommit.ts"
+      instructions: |
+        - Verify CLI argument parsing logic using Commander.js.
+        - Ensure the interactive prompts (Inquirer) are intuitive and handle escapes/interrupts.
+
+chat:
+  auto_reply: true
