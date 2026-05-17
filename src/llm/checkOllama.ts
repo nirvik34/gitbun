@@ -1,8 +1,10 @@
 import fetch from "node-fetch";
 
+const getOllamaUrl = () => process.env.OLLAMA_HOST?.replace(/\/$/, "") || "http://localhost:11434";
+
 export async function isOllamaRunning(): Promise<boolean> {
   try {
-    const res = await fetch("http://localhost:11434");
+    const res = await fetch(getOllamaUrl());
     return res.ok;
   } catch {
     return false;
@@ -11,7 +13,7 @@ export async function isOllamaRunning(): Promise<boolean> {
 
 export async function getAvailableModels(): Promise<string[]> {
   try {
-    const res = await fetch("http://localhost:11434/api/tags");
+    const res = await fetch(`${getOllamaUrl()}/api/tags`);
     if (!res.ok) return [];
     const data = (await res.json()) as { models: { name: string }[] };
     return data.models.map(m => m.name);
