@@ -157,7 +157,7 @@ jobs:
 
 ---
 
-##  Contributing (GSSoC '24)
+##  Contributing (GSSoC '26)
 
 Welcome to Gitbun! We are thrilled to be part of GSSoC. Whether you are fixing a bug, improving our fallback heuristics, or adding features to our Next.js playground, your contributions are highly valued.
 
