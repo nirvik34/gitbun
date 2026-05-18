@@ -17,6 +17,10 @@ export async function generateCommitMessage(cwd: string): Promise<string> {
 	return new Promise((resolve, reject) => {
 		const command = process.platform === "win32" ? "npx.cmd" : "npx";
 		const child = spawn(command, ["gitbun"], { cwd });
+		const timer = setTimeout(() => {
+			child.kill();
+			reject(new Error("Gitbun timed out"));
+		}, 30000);
 
 		let stdout = "";
 		let stderr = "";
@@ -42,6 +46,7 @@ export async function generateCommitMessage(cwd: string): Promise<string> {
 		child.stdin.end();
 
 		child.on("close", (code) => {
+			clearTimeout(timer);
 			const cleanStdout = stripAnsi(stdout);
 			const cleanStderr = stripAnsi(stderr);
 			const message = extractCommitMessage(cleanStdout);
@@ -54,13 +59,13 @@ export async function generateCommitMessage(cwd: string): Promise<string> {
 				return;
 			}
 
-			if (message) {
-				resolve(message);
+			if (code !== 0) {
+				reject(new Error(cleanStderr.trim() || "Failed to generate commit message"));
 				return;
 			}
 
-			if (code !== 0 && cleanStderr.trim()) {
-				reject(new Error(cleanStderr.trim()));
+			if (message) {
+				resolve(message);
 				return;
 			}
 
