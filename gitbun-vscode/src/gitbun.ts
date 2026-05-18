@@ -13,6 +13,11 @@ function extractCommitMessage(output: string): string {
 	return messageBlock.trim();
 }
 
+/**
+ * Generates a commit message by invoking the Gitbun CLI.
+ * @param cwd - Workspace root.
+ * @returns Promise resolving to the commit message string.
+ */
 export async function generateCommitMessage(cwd: string): Promise<string> {
 	return new Promise((resolve, reject) => {
 		const command = process.platform === "win32" ? "npx.cmd" : "npx";

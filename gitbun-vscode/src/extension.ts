@@ -1,6 +1,9 @@
 import * as vscode from 'vscode';
 import { generateCommitMessage } from './gitbun';
 
+/**
+ * Activates the extension and registers the gitbun.generateCommit command.
+ */
 export function activate(context: vscode.ExtensionContext) {
 	const output = vscode.window.createOutputChannel('Gitbun');
 	const disposable = vscode.commands.registerCommand('gitbun.generateCommit', async () => {
@@ -11,8 +14,9 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
-		const api = gitExtension?.getAPI(1);
+		const gitExt = vscode.extensions.getExtension('vscode.git');
+		const gitExports = gitExt ? await gitExt.activate() : undefined;
+		const api = gitExports?.getAPI(1);
 		const repo = api?.repositories[0];
 
 		if (!repo) {
@@ -45,4 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 }
 
+/**
+ * Called when the extension is deactivated.
+ */
 export function deactivate() {}
