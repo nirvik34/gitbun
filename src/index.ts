@@ -50,27 +50,46 @@ export async function run(options: CliOptions) {
       path: file.path,
       additions: stats.additions,
       deletions: stats.deletions,
-      status: file.status
+      status: file.status,
     });
   }
 
   // --- Semantic Analysis (AST-based) ---
   let semanticEvents: SemanticEvent[] = [];
   // Only run if AI is enabled (or we can always run – decide based on config)
-  if (options.ai !== false) { // default true, respects --no-ai
-    const filePaths = enrichedFiles.map(f => f.path);
-    const semanticResult = await analyzeSemanticChanges(filePaths);
-    if (!semanticResult.skipped && semanticResult.events.length > 0) {
-      semanticEvents = semanticResult.events;
-      if (options.verbose) {
-        console.log(chalk.dim(`[semantic] Detected ${semanticEvents.length} structural changes`));
+  if (options.ai !== false) {
+    try {
+      const filePaths = enrichedFiles.map((f) => f.path);
+
+      const semanticResult = await analyzeSemanticChanges(filePaths);
+
+      if (!semanticResult.skipped && semanticResult.events.length > 0) {
+        semanticEvents = semanticResult.events;
+
+        if (options.verbose) {
+          console.log(
+            chalk.dim(
+              `[semantic] Detected ${semanticEvents.length} structural changes`,
+            ),
+          );
+        }
+      } else if (options.verbose && semanticResult.skipped) {
+        console.log(
+          chalk.dim("[semantic] Analysis skipped (timeout or error)"),
+        );
       }
-    } else if (options.verbose && semanticResult.skipped) {
-      console.log(chalk.dim("[semantic] Analysis skipped (timeout or error)"));
+    } catch {
+      if (options.verbose) {
+        console.warn(
+          chalk.yellow(
+            "[semantic] Semantic analysis failed, falling back to diff-based analysis",
+          ),
+        );
+      }
     }
   }
 
-  const scope = detectScope(enrichedFiles.map(f => f.path));
+  const scope = detectScope(enrichedFiles.map((f) => f.path));
   const type = await classifyCommitType(enrichedFiles);
   // Generate summary string for AI fallback (still needed for enhanceCommit)
   const summary = generateSummary(enrichedFiles, semanticEvents);
@@ -84,7 +103,7 @@ export async function run(options: CliOptions) {
     scope,
     enrichedFiles,
     config.format,
-    semanticEvents   // pass events for richer message
+    semanticEvents, // pass events for richer message
   );
 
   // AI enhancement (optional)
@@ -93,7 +112,7 @@ export async function run(options: CliOptions) {
 
     if (!running) {
       console.log(
-        chalk.yellow("Ollama is not running. Using rule-based commit.")
+        chalk.yellow("Ollama is not running. Using rule-based commit."),
       );
     } else {
       let selectedModel = options.model || config.model;
@@ -102,13 +121,15 @@ export async function run(options: CliOptions) {
         selectedModel = (await getBestModel()) || "deepseek-coder:6.7b";
       }
 
-      const spinner = ora(`Enhancing commit with AI (${selectedModel})...`).start();
+      const spinner = ora(
+        `Enhancing commit with AI (${selectedModel})...`,
+      ).start();
 
       try {
         commitMessage = await enhanceCommit(
           commitMessage,
           summary,
-          selectedModel
+          selectedModel,
         );
         spinner.succeed();
       } catch {

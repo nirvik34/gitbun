@@ -37,8 +37,11 @@ function generateSemanticDescription(events: SemanticEvent[]): string {
     logic_extraction: 4,
     logic_movement: 5,
   };
-  events.sort((a, b) => (priority[a.type] || 99) - (priority[b.type] || 99));
-  const main = events[0];
+  const sortedEvents = [...events].sort(
+    (a, b) => (priority[a.type] || 99) - (priority[b.type] || 99),
+  );
+
+  const main = sortedEvents[0];
 
   switch (main.type) {
     case "function_rename": {
@@ -72,7 +75,7 @@ function buildDescription(
   type: string,
   scope: string | null,
   files: FileInfo[],
-  semanticEvents?: SemanticEvent[]
+  semanticEvents?: SemanticEvent[],
 ): string {
   // If we have semantic events, use them to generate a precise description
   if (semanticEvents && semanticEvents.length > 0) {
@@ -167,7 +170,7 @@ export function generateCommitMessage(
   scope: string,
   files: FileInfo[],
   format: string = DEFAULT_TEMPLATE,
-  semanticEvents?: SemanticEvent[]
+  semanticEvents?: SemanticEvent[],
 ): string {
   const description = buildDescription(type, scope, files, semanticEvents);
 
@@ -184,7 +187,7 @@ export function generateCommitMessage(
 
 function formatCommitMessage(
   template: string,
-  data: { type: string; scope: string; message: string }
+  data: { type: string; scope: string; message: string },
 ): string {
   return template
     .replace(/{type}/g, data.type)

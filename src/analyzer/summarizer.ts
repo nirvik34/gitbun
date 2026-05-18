@@ -59,7 +59,7 @@ function detectType(files: FileInfo[]): string {
     ) {
       hasConfig = true;
     }
-    if (file.additions > 0 || file.deletions > 0) {
+    if (file.additions > 0) {
       hasDeletionsOnly = false;
     }
   }
@@ -147,12 +147,21 @@ function enhanceWithSemanticEvents(
     logic_extraction: 4,
     logic_movement: 5,
   };
-  events.sort((a, b) => (priority[a.type] || 99) - (priority[b.type] || 99));
-  const main = events[0];
+  const sortedEvents = [...events].sort(
+    (a, b) => (priority[a.type] || 99) - (priority[b.type] || 99),
+  );
+
+  const main = sortedEvents[0];
 
   switch (main.type) {
-    case "function_rename":
-      return `rename ${main.details.oldName} to ${main.details.newName}`;
+    case "function_rename": {
+      const details = main.details as {
+        oldName: string;
+        newName: string;
+      };
+
+      return `rename ${details.oldName} to ${details.newName}`;
+    }
 
     case "api_signature_change": {
       const details = main.details as { changes: string[] };
