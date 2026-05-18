@@ -1,12 +1,13 @@
 import fetch from "node-fetch";
 
+const getOllamaUrl = () => process.env.OLLAMA_HOST?.replace(/\/$/, "") || "http://localhost:11434";
 const OLLAMA_TIMEOUT_MS = 10000;
 
 export async function isOllamaRunning(): Promise<boolean> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), OLLAMA_TIMEOUT_MS);
   try {
-    const res = await fetch("http://localhost:11434", { signal: controller.signal });
+    const res = await fetch(getOllamaUrl(), { signal: controller.signal });
     return res.ok;
   } catch {
     return false;
@@ -19,7 +20,7 @@ export async function getAvailableModels(): Promise<string[]> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), OLLAMA_TIMEOUT_MS);
   try {
-    const res = await fetch("http://localhost:11434/api/tags", { signal: controller.signal });
+    const res = await fetch(`${getOllamaUrl()}/api/tags`, { signal: controller.signal });
     if (!res.ok) return [];
     const data = (await res.json()) as { models: { name: string }[] };
     return data.models.map(m => m.name);

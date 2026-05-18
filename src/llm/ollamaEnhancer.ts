@@ -20,6 +20,8 @@ Follow these rules strictly:
 6. Max length 72 characters.
 7. If the original message is already excellent, return it as is.`;
 
+const getOllamaUrl = () => process.env.OLLAMA_HOST?.replace(/\/$/, "") || "http://localhost:11434";
+
 export async function enhanceCommit(
   originalMessage: string,
   summary: string,
@@ -35,7 +37,7 @@ ${summary}`;
   const timeoutId = setTimeout(() => controller.abort(), OLLAMA_ENHANCE_TIMEOUT_MS);
 
   try {
-    const response = await fetch("http://localhost:11434/api/chat", {
+    const response = await fetch(`${getOllamaUrl()}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
