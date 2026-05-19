@@ -25,6 +25,7 @@ interface CliOptions {
   ai?: boolean;
   model?: string;
   auto?: boolean;
+  generateOnly?: boolean;
   [key: string]: unknown;
 }
 
@@ -86,6 +87,11 @@ const config = await loadConfig();
 
 let commitMessage = generateCommitMessage(type, scope, prioritizedFiles, config.format);
 
+  // Hook mode: print message to stdout and exit without committing
+  if (options.generateOnly) {
+    console.log(commitMessage);
+    return;
+  }
 
   // AI enhancement (optional)
   if (options.ai) {
