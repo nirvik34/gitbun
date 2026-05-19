@@ -12,6 +12,7 @@ import {
   filterLowSignalFiles,
   type FileChange,
 } from "./analyzer/fileFilter";
+import { filterSensitiveFiles } from "./analyzer/sensitiveFileFilter";
 import { sortBySignal } from "./analyzer/fileScorer";
 import { deduplicateFiles } from "./analyzer/fileDeduplicator";
 import { generateCommitMessage } from "./generator/commitGenerator";
@@ -69,7 +70,8 @@ export async function run(options: CliOptions) {
   }
 
 const filteredFiles = filterLowSignalFiles(enrichedFiles);
-const prioritizedCandidates = sortBySignal(filteredFiles, getDiffForFile);
+const safeFiles = filterSensitiveFiles(filteredFiles, getDiffForFile);
+const prioritizedCandidates = sortBySignal(safeFiles, getDiffForFile);
 const prioritizedFiles = prioritizedCandidates.length > 0
   ? prioritizedCandidates
   : enrichedFiles;
