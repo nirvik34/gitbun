@@ -55,66 +55,83 @@ export async function run(options: CliOptions) {
     process.exit(0);
   }
 
-  // Enrich file stats
-  const enrichedFiles: FileChange[] = [];
+  const spinner = ora();
+  let commitMessage = "";
 
-  for (const file of stagedFiles) {
-    const stats = await getDiffStats(file.path);
-    enrichedFiles.push({
-      path: file.path,
-      additions: stats.additions,
-      deletions: stats.deletions,
-      status: file.status
-    });
-  }
+  try {
+    const enrichedFiles: FileChange[] = [];
+    spinner.start("Analyzing staged changes...");
+    for (const file of stagedFiles) {
+      const stats = await getDiffStats(file.path);
+      enrichedFiles.push({
+        path: file.path,
+        additions: stats.additions,
+        deletions: stats.deletions,
+        status: file.status,
+      });
+    }
 
-const filteredFiles = filterLowSignalFiles(enrichedFiles);
-const prioritizedCandidates = sortBySignal(filteredFiles, getDiffForFile);
-const prioritizedFiles = prioritizedCandidates.length > 0
-  ? prioritizedCandidates
-  : enrichedFiles;
-const MIN_GROUP_SIZE = 2;
-const deduplicatedResult = deduplicateFiles(prioritizedFiles, MIN_GROUP_SIZE);
+    const filteredFiles = filterLowSignalFiles(enrichedFiles);
+    const prioritizedCandidates = sortBySignal(filteredFiles, getDiffForFile);
+    const prioritizedFiles =
+      prioritizedCandidates.length > 0 ? prioritizedCandidates : enrichedFiles;
+    const MIN_GROUP_SIZE = 2;
+    const deduplicatedResult = deduplicateFiles(
+      prioritizedFiles,
+      MIN_GROUP_SIZE
+    );
 
-const scope = detectScope(prioritizedFiles.map(f => f.path));
-const type = await classifyCommitType(prioritizedFiles);
-const summary = generateSummaryFromResult(deduplicatedResult);
+    const scope = detectScope(prioritizedFiles.map((f) => f.path));
+    const type = await classifyCommitType(prioritizedFiles);
+    const summary = generateSummaryFromResult(deduplicatedResult);
 
+    spinner.succeed("Analyzing staged changes...");
 
-// Load config
-const config = await loadConfig();
+    // Load config
+    const config = await loadConfig();
 
-let commitMessage = generateCommitMessage(type, scope, prioritizedFiles, config.format);
+    spinner.start("Generating commit message...");
+    commitMessage = generateCommitMessage(
+      type,
+      scope,
+      prioritizedFiles,
+      config.format
+    );
+    spinner.succeed("Generating commit message...");
 
+    // AI enhancement (optional)
+    if (options.ai) {
+      const running = await isOllamaRunning();
 
-  // AI enhancement (optional)
-  if (options.ai) {
-    const running = await isOllamaRunning();
-
-    if (!running) {
-      console.log(
-        chalk.yellow("Ollama is not running. Using rule-based commit.")
-      );
-    } else {
-      let selectedModel = options.model || config.model;
-
-      if (!selectedModel) {
-        selectedModel = (await getBestModel()) || "deepseek-coder:6.7b";
-      }
-
-      const spinner = ora(`Enhancing commit with AI (${selectedModel})...`).start();
-
-      try {
-        commitMessage = await enhanceCommit(
-          commitMessage,
-          summary,
-          selectedModel
+      if (!running) {
+        console.log(
+          chalk.yellow("\nOllama is not running. Using rule-based commit.")
         );
-        spinner.succeed();
-      } catch {
-        spinner.fail("AI enhancement failed");
+      } else {
+        let selectedModel = options.model || config.model;
+
+        if (!selectedModel) {
+          selectedModel = (await getBestModel()) || "deepseek-coder:6.7b";
+        }
+
+        spinner.start(`Enhancing commit with AI (${selectedModel})...`);
+
+        try {
+          commitMessage = await enhanceCommit(
+            commitMessage,
+            summary,
+            selectedModel
+          );
+          spinner.succeed(`Enhanced commit with AI (${selectedModel})`);
+        } catch {
+          spinner.fail("AI enhancement failed");
+        }
       }
     }
+  } catch (error) {
+    spinner.fail("Failed during analysis or generation.");
+    console.error(error);
+    process.exit(1);
   }
 
   // Confirmation flow
