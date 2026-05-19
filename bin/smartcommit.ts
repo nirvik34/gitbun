@@ -11,7 +11,13 @@ program
   .option("--auto", "Auto accept commit without confirmation")
   .option("--model <name>", "Specify Ollama model");
 program.action(async (options) => {
-  await run(options);
+  try {
+    await run(options);
+    process.exit(0);
+  } catch (error: any) {
+    console.error(error.message);
+    process.exit(1);
+  }
 });
 
 program.parse();

@@ -43,16 +43,13 @@ export async function run(options: CliOptions) {
   // Ensure we are inside a Git repo
   const repo = await isGitRepo();
   if (!repo) {
-    console.log(chalk.red("Not inside a Git repository."));
-    process.exit(1);
+    throw new Error(chalk.red("Not inside a Git repository."));
   }
 
   const stagedFiles = await getStagedFiles();
 
   if (stagedFiles.length === 0) {
-    console.log(chalk.yellow("No staged changes found."));
-    console.log("Stage changes using: git add <file>");
-    process.exit(0);
+    throw new Error(chalk.yellow("No staged changes found.") + "\nStage changes using: git add <file>");
   }
 
   // Enrich file stats
@@ -126,8 +123,7 @@ let commitMessage = generateCommitMessage(type, scope, prioritizedFiles, config.
     const result = await confirmCommit(commitMessage);
 
     if (!result) {
-      console.log("Commit cancelled.");
-      process.exit(0);
+      throw new Error("Commit cancelled.");
     }
 
     finalMessage = result;
