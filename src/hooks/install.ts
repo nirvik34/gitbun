@@ -1,11 +1,13 @@
+import { execFileSync } from "node:child_process";
 import { existsSync, writeFileSync, chmodSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import chalk from "chalk";
 
 const HOOK_MARKER = "# Installed by gitbun";
 
+// ASCII dashes only -- no Unicode em dashes that can break shell scripts
 const HOOK_SCRIPT = `#!/bin/sh
-${HOOK_MARKER} — remove with: gitbun hooks uninstall
+${HOOK_MARKER} -- remove with: gitbun hooks uninstall
 COMMIT_MSG_FILE="$1"
 COMMIT_SOURCE="$2"
 
@@ -14,12 +16,27 @@ if [ -n "$COMMIT_SOURCE" ]; then
   exit 0
 fi
 
-# Generate commit message and pre-fill the editor
-gitbun --generate-only > "$COMMIT_MSG_FILE"
+# Generate commit message -- only write on success to avoid corrupting the commit file
+GENERATED=$(gitbun --generate-only 2>/dev/null)
+if [ $? -eq 0 ] && [ -n "$GENERATED" ]; then
+  printf '%s\\n' "$GENERATED" > "$COMMIT_MSG_FILE"
+fi
 `;
 
+function getHooksDir(): string {
+  try {
+    const gitDir = execFileSync("git", ["rev-parse", "--git-dir"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    return join(gitDir, "hooks");
+  } catch {
+    return join(process.cwd(), ".git", "hooks");
+  }
+}
+
 export async function installHook(force = false): Promise<void> {
-  const hooksDir = join(process.cwd(), ".git", "hooks");
+  const hooksDir = getHooksDir();
 
   if (!existsSync(hooksDir)) {
     console.log(
@@ -48,7 +65,7 @@ export async function installHook(force = false): Promise<void> {
   try {
     chmodSync(hookPath, "755");
   } catch {
-    // On Windows, git manages hook permissions — chmod is a no-op
+    // On Windows, git manages hook permissions -- chmod is a no-op
   }
 
   console.log(chalk.green("✓ Gitbun hook installed (prepare-commit-msg)"));
