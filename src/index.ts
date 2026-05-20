@@ -17,9 +17,9 @@ import { deduplicateFiles } from "./analyzer/fileDeduplicator";
 import { generateCommitMessage } from "./generator/commitGenerator";
 import { confirmCommit } from "./ui/interactive";
 import { commit } from "./git/commit";
-import { enhanceCommit } from "./llm/ollamaEnhancer";
 import { loadConfig } from "./config/loadConfig";
-import { isOllamaRunning, getBestModel } from "./llm/checkOllama";
+import { createProvider } from "./llm";
+import type { ProviderConfig } from "./llm";
 import { ValidationError, CancellationError } from "./utils/errors";
 
 interface CliOptions {
@@ -100,30 +100,43 @@ export async function run(options: CliOptions) {
 
     // AI enhancement (optional)
     if (options.ai) {
-      const running = await isOllamaRunning();
+      const provider = createProvider(config as ProviderConfig, process.env);
+      const available = await provider.isAvailable();
 
-      if (!running) {
+      if (!available) {
         console.log(
-          chalk.yellow("\nOllama is not running. Using rule-based commit.")
+          chalk.yellow(
+            `\n${provider.name} is not available. Using rule-based commit.`
+          )
         );
       } else {
-        let selectedModel = options.model || config.model;
+        const selectedModel = await provider.resolveModel(
+          options.model || config.model
+        );
 
         if (!selectedModel) {
-          selectedModel = (await getBestModel()) || "deepseek-coder:6.7b";
-        }
-
-        spinner.start(`Enhancing commit with AI (${selectedModel})...`);
-
-        try {
-          commitMessage = await enhanceCommit(
-            commitMessage,
-            summary,
-            selectedModel
+          console.log(
+            chalk.yellow(
+              `\nNo model resolved for ${provider.name}. Using rule-based commit.`
+            )
           );
-          spinner.succeed(`Enhanced commit with AI (${selectedModel})`);
-        } catch {
-          spinner.fail("AI enhancement failed");
+        } else {
+          spinner.start(
+            `Enhancing commit with ${provider.name} (${selectedModel})...`
+          );
+
+          try {
+            commitMessage = await provider.enhanceCommit(
+              commitMessage,
+              summary,
+              selectedModel
+            );
+            spinner.succeed(
+              `Enhanced commit with ${provider.name} (${selectedModel})`
+            );
+          } catch {
+            spinner.fail("AI enhancement failed");
+          }
         }
       }
     }

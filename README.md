@@ -80,6 +80,38 @@ ollama pull deepseek-coder:6.7b
 
 ---
 
+## Remote AI Providers
+
+Gitbun can also call hosted models from OpenAI, Anthropic, and Google. Pick a backend in your config, then export an API key.
+
+| Backend | Default Model | Env Var (preferred) | Env Var (fallback) |
+| --- | --- | --- | --- |
+| `ollama` | auto-detected | `OLLAMA_HOST` | — |
+| `openai` | `gpt-4o-mini` | `LLM_API_KEY` | `OPENAI_API_KEY` |
+| `anthropic` | `claude-haiku-4-5-20251001` | `LLM_API_KEY` | `ANTHROPIC_API_KEY` |
+| `gemini` | `gemini-1.5-flash` | `LLM_API_KEY` | `GEMINI_API_KEY` |
+
+`LLM_API_KEY` is checked first so a single key can drive any cloud backend. The provider-specific variable is used as a fallback.
+
+**Example `.smartcommitrc` for OpenAI:**
+
+```json
+{
+  "backend": "openai",
+  "model": "gpt-4o-mini",
+  "ai": true
+}
+```
+
+```sh
+export OPENAI_API_KEY=sk-...
+gitbun --ai
+```
+
+If the selected backend is unavailable (no key set, network down, Ollama not running), Gitbun falls back to its rule-based engine — your commit still gets generated.
+
+---
+
 ## Configuration
 
 Gitbun uses [Cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to find settings. You can add a `smartcommit` block to your `package.json` or create a `.smartcommitrc` file.
