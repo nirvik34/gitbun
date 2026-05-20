@@ -17,6 +17,35 @@ describe('detectScope', () => {
         const files = ['src/analyzer/f1.ts', 'src/ui/f2.ts', 'src/ui/f3.ts'];
         expect(detectScope(files)).toBe('ui');
     });
+
+    it('should detect monorepo scope from apps/ directory', () => {
+        const files = ['apps/web/src/auth/login.ts'];
+        expect(detectScope(files)).toBe('web');
+    });
+
+    it('should detect monorepo scope from packages/ directory', () => {
+        const files = ['packages/ui/Button.tsx', 'packages/ui/Modal.tsx'];
+        expect(detectScope(files)).toBe('ui');
+    });
+
+    it('should detect monorepo scope from libs/ directory', () => {
+        const files = ['libs/shared/utils/index.ts'];
+        expect(detectScope(files)).toBe('shared');
+    });
+
+    it('should detect monorepo scope from services/ directory', () => {
+        const files = ['services/auth-service/src/index.ts'];
+        expect(detectScope(files)).toBe('auth-service');
+    });
+
+    it('should pick the most frequent monorepo package scope', () => {
+        const files = [
+            'libs/shared/utils.ts',
+            'apps/api/server.ts',
+            'apps/api/routes.ts',
+        ];
+        expect(detectScope(files)).toBe('api');
+    });
 });
 
 describe('Errors', () => {
