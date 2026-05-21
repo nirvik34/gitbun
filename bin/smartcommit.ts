@@ -12,7 +12,8 @@ program
   .option("--ai", "Enhance commit message using AI")
   .option("--auto", "Auto accept commit without confirmation")
   .option("--model <name>", "Specify Ollama model")
-  .option("--dry-run", "Print the generated commit message and exit without committing");
+  .option("--dry-run", "Print the generated commit message and exit without committing")
+  .option("--share", "Push and generate a shareable explainer link");
 program.action(async (options) => {
   try {
     await run(options);

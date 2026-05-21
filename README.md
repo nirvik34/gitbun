@@ -59,6 +59,7 @@ Then simply type `gitbun` in any repository.
 | `--model <name>` | - | Specify a specific LLM model (e.g. `llama3`) |
 | `--interactive` | `-i` | Force interactive preview (default: `true`) |
 | `--auto` | - | Commit immediately without preview (DANGEROUS) |
+| `--share` | - | Push and generate a shareable explainer link |
 | `--config <path>` | - | Path to a custom config file |
 | `--help` | - | Show usage info |
 
@@ -80,6 +81,38 @@ ollama pull deepseek-coder:6.7b
 
 ---
 
+## Remote AI Providers
+
+Gitbun can also call hosted models from OpenAI, Anthropic, and Google. Pick a backend in your config, then export an API key.
+
+| Backend | Default Model | Env Var (preferred) | Env Var (fallback) |
+| --- | --- | --- | --- |
+| `ollama` | auto-detected | `OLLAMA_HOST` | — |
+| `openai` | `gpt-4o-mini` | `LLM_API_KEY` | `OPENAI_API_KEY` |
+| `anthropic` | `claude-haiku-4-5-20251001` | `LLM_API_KEY` | `ANTHROPIC_API_KEY` |
+| `gemini` | `gemini-1.5-flash` | `LLM_API_KEY` | `GEMINI_API_KEY` |
+
+`LLM_API_KEY` is checked first so a single key can drive any cloud backend. The provider-specific variable is used as a fallback.
+
+**Example `.smartcommitrc` for OpenAI:**
+
+```json
+{
+  "backend": "openai",
+  "model": "gpt-4o-mini",
+  "ai": true
+}
+```
+
+```sh
+export OPENAI_API_KEY=sk-...
+gitbun --ai
+```
+
+If the selected backend is unavailable (no key set, network down, Ollama not running), Gitbun falls back to its rule-based engine — your commit still gets generated.
+
+---
+
 ## Configuration
 
 Gitbun uses [Cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to find settings. You can add a `smartcommit` block to your `package.json` or create a `.smartcommitrc` file.
@@ -94,6 +127,26 @@ Gitbun uses [Cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to find se
 }
 
 ```
+
+---
+
+## Sharing a Commit (`--share`)
+
+`gitbun --share` packages the just-generated commit (message + diff + AI reasoning) and uploads it to your Gitbun frontend, which returns a temporary URL anyone can open to read the commit beautifully.
+
+```sh
+export GITBUN_SHARE_URL=http://localhost:3000
+gitbun --share --ai
+```
+
+Configuration:
+
+- `shareUrl` in `.smartcommitrc` or the `GITBUN_SHARE_URL` env var (env wins).
+- Without either, `--share` errors out before committing — your repo is untouched.
+- After the commit, Gitbun prompts you before `git push`. Use `--auto` to push without prompting (useful in CI).
+- The share endpoint stores payloads for 24 hours in process memory; the link will stop working after that or after the server restarts.
+
+**Privacy:** `--share` sends the staged diff, the commit message, and the AI's reasoning prose to whatever URL you configured. The flag is explicit and never default.
 
 ---
 
