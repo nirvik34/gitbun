@@ -1,5 +1,10 @@
 export type ProviderName = "ollama" | "openai" | "anthropic" | "gemini";
 
+export interface ChatOptions {
+  maxTokens?: number;
+  temperature?: number;
+}
+
 export interface LLMProvider {
   readonly name: ProviderName;
 
@@ -12,6 +17,19 @@ export interface LLMProvider {
     summary: string,
     model: string
   ): Promise<string>;
+
+  /**
+   * Free-form chat call returning the assistant's text or `null` if the
+   * provider is unavailable / the call failed. Used by features that need
+   * arbitrary prose (e.g. commit explanations) rather than a refined
+   * conventional commit line.
+   */
+  chat(
+    systemPrompt: string,
+    userPrompt: string,
+    model: string,
+    options?: ChatOptions
+  ): Promise<string | null>;
 }
 
 export interface ProviderConfig {

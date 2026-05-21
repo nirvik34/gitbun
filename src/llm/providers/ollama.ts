@@ -4,6 +4,7 @@ import {
   COMMIT_SYSTEM_PROMPT,
   buildUserPrompt,
   cleanCommitOutput,
+  type ChatOptions,
   type LLMProvider,
   type ProviderEnv,
 } from "../types";
@@ -126,6 +127,46 @@ export async function enhanceCommitOllama(
   }
 }
 
+export async function chatOllama(
+  systemPrompt: string,
+  userPrompt: string,
+  model: string,
+  options: ChatOptions = {},
+  env: ProviderEnv = process.env
+): Promise<string | null> {
+  try {
+    return await withTimeout(async (signal) => {
+      const response = await fetch(`${getOllamaUrl(env)}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          stream: false,
+          options: {
+            temperature: options.temperature ?? 0.2,
+            num_predict: options.maxTokens,
+          },
+        }),
+        signal,
+      });
+
+      const data = (await response.json()) as OllamaChatResponse;
+      if (data.error) {
+        console.log(`\nOllama error: ${data.error}`);
+        return null;
+      }
+      return data.message?.content?.trim() || null;
+    }, OLLAMA_TIMEOUT_MS);
+  } catch (error) {
+    console.log("\nOllama chat failed:", error);
+    return null;
+  }
+}
+
 export function createOllamaProvider(env: ProviderEnv = process.env): LLMProvider {
   return {
     name: "ollama",
@@ -137,5 +178,7 @@ export function createOllamaProvider(env: ProviderEnv = process.env): LLMProvide
     },
     enhanceCommit: (original, summary, model) =>
       enhanceCommitOllama(original, summary, model, env),
+    chat: (systemPrompt, userPrompt, model, options) =>
+      chatOllama(systemPrompt, userPrompt, model, options, env),
   };
 }

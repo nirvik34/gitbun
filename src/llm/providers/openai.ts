@@ -5,6 +5,7 @@ import {
   buildUserPrompt,
   cleanCommitOutput,
   resolveApiKey,
+  type ChatOptions,
   type LLMProvider,
   type ProviderEnv,
 } from "../types";
@@ -17,6 +18,53 @@ type OpenAIResponse = {
   choices?: { message?: { content?: string } }[];
   error?: { message?: string };
 };
+
+async function callOpenAI(
+  apiKey: string,
+  model: string,
+  systemPrompt: string,
+  userPrompt: string,
+  options: ChatOptions
+): Promise<string | null> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(OPENAI_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: options.temperature ?? 0.2,
+        ...(options.maxTokens !== undefined ? { max_tokens: options.maxTokens } : {}),
+      }),
+      signal: controller.signal,
+    });
+
+    const data = (await response.json()) as OpenAIResponse;
+
+    if (!response.ok || data.error) {
+      console.log(
+        `\nOpenAI error: ${data.error?.message ?? `HTTP ${response.status}`}`
+      );
+      return null;
+    }
+
+    return data.choices?.[0]?.message?.content ?? null;
+  } catch (error) {
+    console.log("\nOpenAI call failed:", error);
+    return null;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 export function createOpenAIProvider(env: ProviderEnv = process.env): LLMProvider {
   const apiKey = resolveApiKey("openai", env);
@@ -44,46 +92,26 @@ export function createOpenAIProvider(env: ProviderEnv = process.env): LLMProvide
         return originalMessage;
       }
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
+      const raw = await callOpenAI(
+        apiKey,
+        model,
+        COMMIT_SYSTEM_PROMPT,
+        buildUserPrompt(originalMessage, summary),
+        {}
+      );
 
-      try {
-        const response = await fetch(OPENAI_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            model,
-            messages: [
-              { role: "system", content: COMMIT_SYSTEM_PROMPT },
-              { role: "user", content: buildUserPrompt(originalMessage, summary) },
-            ],
-            temperature: 0.2,
-          }),
-          signal: controller.signal,
-        });
+      return raw ? cleanCommitOutput(raw) : originalMessage;
+    },
 
-        const data = (await response.json()) as OpenAIResponse;
-
-        if (!response.ok || data.error) {
-          console.log(
-            `\nOpenAI error: ${data.error?.message ?? `HTTP ${response.status}`}`
-          );
-          return originalMessage;
-        }
-
-        const content = data.choices?.[0]?.message?.content;
-        if (!content) return originalMessage;
-
-        return cleanCommitOutput(content);
-      } catch (error) {
-        console.log("\nAI Enhancement Failed:", error);
-        return originalMessage;
-      } finally {
-        clearTimeout(timeoutId);
-      }
+    async chat(
+      systemPrompt: string,
+      userPrompt: string,
+      model: string,
+      options: ChatOptions = {}
+    ): Promise<string | null> {
+      if (!apiKey) return null;
+      const raw = await callOpenAI(apiKey, model, systemPrompt, userPrompt, options);
+      return raw ? raw.trim() : null;
     },
   };
 }

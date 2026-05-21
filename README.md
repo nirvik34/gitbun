@@ -59,6 +59,7 @@ Then simply type `gitbun` in any repository.
 | `--model <name>` | - | Specify a specific LLM model (e.g. `llama3`) |
 | `--interactive` | `-i` | Force interactive preview (default: `true`) |
 | `--auto` | - | Commit immediately without preview (DANGEROUS) |
+| `--share` | - | Push and generate a shareable explainer link |
 | `--config <path>` | - | Path to a custom config file |
 | `--help` | - | Show usage info |
 
@@ -126,6 +127,26 @@ Gitbun uses [Cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to find se
 }
 
 ```
+
+---
+
+## Sharing a Commit (`--share`)
+
+`gitbun --share` packages the just-generated commit (message + diff + AI reasoning) and uploads it to your Gitbun frontend, which returns a temporary URL anyone can open to read the commit beautifully.
+
+```sh
+export GITBUN_SHARE_URL=http://localhost:3000
+gitbun --share --ai
+```
+
+Configuration:
+
+- `shareUrl` in `.smartcommitrc` or the `GITBUN_SHARE_URL` env var (env wins).
+- Without either, `--share` errors out before committing — your repo is untouched.
+- After the commit, Gitbun prompts you before `git push`. Use `--auto` to push without prompting (useful in CI).
+- The share endpoint stores payloads for 24 hours in process memory; the link will stop working after that or after the server restarts.
+
+**Privacy:** `--share` sends the staged diff, the commit message, and the AI's reasoning prose to whatever URL you configured. The flag is explicit and never default.
 
 ---
 
