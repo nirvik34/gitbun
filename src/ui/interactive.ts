@@ -1,4 +1,5 @@
 import inquirer from "inquirer";
+import clipboard from "clipboardy";
 
 export async function confirmCommit(message: string): Promise<string | null> {
   console.log("\n" + message + "\n");
@@ -7,7 +8,7 @@ export async function confirmCommit(message: string): Promise<string | null> {
     {
       type: "input",
       name: "action",
-      message: "Accept commit? (Y/n/e)",
+      message: "Accept commit? (Y/n/e/c)",
       default: "Y"
     }
   ]);
@@ -26,6 +27,12 @@ export async function confirmCommit(message: string): Promise<string | null> {
       }
     ]);
     return edited;
+  }
+
+  if (value === "c") {
+    clipboard.writeSync(message);
+    console.log("Commit message copied to clipboard.");
+    return null;
   }
 
   return null;
