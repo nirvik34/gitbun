@@ -73,6 +73,27 @@ describe("detectMonorepoPackage", () => {
     it("returns null for a bare filename", () => {
         expect(detectMonorepoPackage("package.json")).toBeNull();
     });
+
+    it("only detects monorepo packages at root level (index 0)", () => {
+        expect(detectMonorepoPackage("apps/web/src/index.ts")).toBe("web");
+        expect(detectMonorepoPackage("packages/ui/button.ts")).toBe("ui");
+        expect(detectMonorepoPackage("libs/shared/util.ts")).toBe("shared");
+        expect(detectMonorepoPackage("services/auth-service/index.ts")).toBe("auth-service");
+    });
+
+    it("returns null for nested monorepo segments (false positive prevention)", () => {
+        expect(detectMonorepoPackage("src/components/apps/web/button.ts")).toBeNull();
+        expect(detectMonorepoPackage("src/packages/ui/index.ts")).toBeNull();
+        expect(detectMonorepoPackage("random/libs/shared/test.ts")).toBeNull();
+        expect(detectMonorepoPackage("foo/bar/apps/web/index.ts")).toBeNull();
+        expect(detectMonorepoPackage("deep/nested/packages/core/util.ts")).toBeNull();
+    });
+
+    it("returns null when monorepo segment is at index 0 but has no package name", () => {
+        expect(detectMonorepoPackage("apps/")).toBeNull();
+        expect(detectMonorepoPackage("packages/")).toBeNull();
+        expect(detectMonorepoPackage("libs")).toBeNull();
+    });
 });
 
 describe("detectScope with filesystem-confirmed monorepo", () => {

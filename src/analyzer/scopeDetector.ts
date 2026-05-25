@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
 import { getLanguageProfile } from "./languageAnalyzer";
-import path from 'path';
 
 const MONOREPO_MARKERS = [
   "nx.json",
@@ -28,13 +27,10 @@ export function detectMonorepoPackage(
   file: string
 ): string | null {
   const parts = file.split("/");
+  const firstSegment = parts[0];
 
-  for (const segment of MONOREPO_ROOT_SEGMENTS) {
-    const idx = parts.indexOf(segment);
-
-    if (idx !== -1 && parts[idx + 1]) {
-      return parts[idx + 1];
-    }
+  if (MONOREPO_ROOT_SEGMENTS.includes(firstSegment) && parts[1]) {
+    return parts[1];
   }
 
   return null;
