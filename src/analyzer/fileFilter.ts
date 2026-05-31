@@ -1,5 +1,20 @@
 import { execFileSync } from "node:child_process";
+import fs from 'fs';
+import path from 'path';
+import ignore from 'ignore';
 
+export function getFilteredFiles(files: string[], rootDir: string): string[] {
+  const ig = ignore();
+  
+  const ignorePath = path.join(rootDir, '.gitbunignore');
+  if (fs.existsSync(ignorePath)) {
+    ig.add(fs.readFileSync(ignorePath).toString());
+  } else {
+    ig.add(['package-lock.json', 'dist/', 'build/', 'node_modules/']);
+  }
+
+  return files.filter(file => !ig.ignores(file));
+}
 export type FileChange = {
   path: string;
   additions: number;
