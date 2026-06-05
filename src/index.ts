@@ -26,6 +26,10 @@ import { analyzeSemanticChanges } from "./analyzer/semanticAnalyzer";
 import { SemanticEvent } from "./analyzer/semanticTypes";
 import { ValidationError, CancellationError } from "./utils/errors";
 import { colorizeCommitMessage } from "./utils/commitColors";
+import {
+  analyzeCommitQuality,
+  shouldBlockCommitForQuality,
+} from "./validators/commitQuality";
 
 interface CliOptions {
   ai?: boolean;
@@ -119,6 +123,7 @@ export async function run(options: CliOptions) {
 
   const spinner = ora();
   let commitMessage = "";
+  const config = await loadConfig();
 
   try {
     // --- Build enriched files (from main, but without spinner yet) ---
@@ -177,7 +182,6 @@ export async function run(options: CliOptions) {
 
     // --- Generate commit message (pass semantic events) ---
     spinner.start("Generating commit message...");
-    const config = await loadConfig();
     commitMessage = generateCommitMessage(
       type,
       scope,
@@ -228,6 +232,24 @@ export async function run(options: CliOptions) {
   if (options.dryRun) {
     console.log("\n" + colorizeCommitMessage(commitMessage) + "\n");
     process.exit(0);
+  }
+
+  if (config.qualityCheck !== false) {
+    const quality = analyzeCommitQuality(commitMessage);
+
+    if (!options.auto && quality.score < 100) {
+      console.log(`\nCommit Quality: ${quality.score}/100\n`);
+      console.log("Warnings:");
+      for (const warning of quality.warnings) {
+        console.log(`- ${warning}`);
+      }
+    }
+
+    if (shouldBlockCommitForQuality(quality, config.strictQuality)) {
+      throw new ValidationError(
+        `Commit quality score ${quality.score}/100 is below strict threshold.`
+      );
+    }
   }
 
   // Confirmation
