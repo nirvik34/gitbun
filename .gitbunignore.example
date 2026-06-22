@@ -1,0 +1,9 @@
+# .gitbunignore
+# Add file patterns here to prevent them from being sent to the AI.
+# Syntax is identical to .gitignore — one pattern per line.
+# Lines starting with # are comments and are ignored.
+#
+# Examples:
+# my-custom-secrets.json
+# internal/api-keys.txt
+# *.localenv
