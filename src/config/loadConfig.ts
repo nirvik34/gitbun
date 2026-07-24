@@ -5,6 +5,10 @@ export interface GitbunConfig {
   customPrompt?: string;
   format?: string;
   model?: string;
+  ai?: boolean;
+  interactive?: boolean;
+  provider?: 'ollama' | 'openai' | 'anthropic'; // add this
+  apiKey?: string;  
 }
 
 /** Loads and returns user config from .gitbunrc or cosmiconfig. */
