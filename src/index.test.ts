@@ -1,6 +1,13 @@
-import { describe, it, expect } from 'vitest';
+// src/index.test.ts
+import { describe, it, expect, vi } from 'vitest';
 import { detectScope } from './analyzer/scopeDetector';
 import { ValidationError, CancellationError } from './utils/errors';
+
+// Mock any external dependencies if needed
+vi.mock('node:child_process', () => ({
+  execFileSync: vi.fn(),
+  execFile: vi.fn(),
+}));
 
 describe('detectScope', () => {
     it('should detect scope from src directory', () => {
