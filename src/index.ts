@@ -4,9 +4,10 @@ import ora from "ora";
 import inquirer from "inquirer";
 import { execFileSync } from "node:child_process";
 
-import { isGitRepo } from "./git/checkRepo";
+import { isGitRepo, isFirstCommit } from "./git/checkRepo";
 import { getStagedFiles } from "./git/getStagedFiles";
 import { getDiffStats } from "./git/getDiffStats";
+import { scanDiff } from "./analyzer/diffScanner";
 import { detectScope } from "./analyzer/scopeDetector";
 import { classifyCommitType } from "./analyzer/typeClassifier";
 import { generateSummaryFromResult } from "./analyzer/summarizer";
@@ -34,6 +35,7 @@ interface CliOptions {
   generateOnly?: boolean;
   verbose?: boolean;
   dryRun?: boolean;
+  minGroupSize?: number;
   [key: string]: unknown;
 }
 
@@ -117,8 +119,30 @@ export async function run(options: CliOptions) {
     return;
   }
 
+  const firstCommit = await isFirstCommit();
+
   const spinner = ora();
   let commitMessage = "";
+
+  if (firstCommit) {
+    commitMessage = "first commit";
+    if (!options.generateOnly && !options.dryRun && !options.auto) {
+      const result = await confirmCommit(commitMessage);
+      if (!result) {
+        throw new CancellationError();
+      }
+      const output = await commit(result);
+      console.log("\n" + output);
+    } else {
+      if (options.generateOnly) console.log(commitMessage);
+      if (options.dryRun) console.log("\n" + colorizeCommitMessage(commitMessage) + "\n");
+      if (options.auto) {
+        const output = await commit(commitMessage);
+        console.log("\n" + output);
+      }
+    }
+    return;
+  }
 
   try {
     // --- Build enriched files (from main, but without spinner yet) ---
@@ -168,14 +192,16 @@ export async function run(options: CliOptions) {
     const prioritizedCandidates = sortBySignal(filteredFiles, getDiffForFile);
     const prioritizedFiles =
       prioritizedCandidates.length > 0 ? prioritizedCandidates : enrichedFiles;
-    const MIN_GROUP_SIZE = 2;
+    const MIN_GROUP_SIZE = options.minGroupSize ?? 2;
     const deduplicatedResult = deduplicateFiles(prioritizedFiles, MIN_GROUP_SIZE);
 
     const scope = detectScope(prioritizedFiles.map((f) => f.path));
     const type = await classifyCommitType(prioritizedFiles);
     const summary = generateSummaryFromResult(deduplicatedResult);
 
-    // --- Generate commit message (pass semantic events) ---
+    const diffSignals = await scanDiff();
+
+    // --- Generate commit message (pass semantic events and diff signals) ---
     spinner.start("Generating commit message...");
     const config = await loadConfig();
     commitMessage = generateCommitMessage(
@@ -183,7 +209,8 @@ export async function run(options: CliOptions) {
       scope,
       prioritizedFiles,
       config.format,
-      semanticEvents  // added from semantic branch
+      semanticEvents,
+      diffSignals,
     );
     spinner.succeed("Generating commit message...");
 
@@ -203,9 +230,8 @@ export async function run(options: CliOptions) {
             commitMessage,
             summary,
             selectedModel,
-            config
+            config,
           );
-          commitMessage = await enhanceCommit(commitMessage, summary, selectedModel, config);
           spinner.succeed(`Enhanced commit with AI (${selectedModel})`);
         } catch {
           spinner.fail("AI enhancement failed");
