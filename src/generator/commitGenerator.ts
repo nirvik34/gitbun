@@ -1,17 +1,17 @@
 // src/generator/commitGenerator.ts
 import { FileInfo } from "../analyzer/summarizer";
 import { SemanticEvent } from "../analyzer/semanticTypes";
+import type { DiffSignals } from "../analyzer/diffScanner";
+import { generateDetailedDescription } from "../analyzer/summarizer";
 
 const DEFAULT_TEMPLATE = "{type}{scope}: {message}";
 
 function normalizeTemplate(template: string): string {
   const validPlaceholders = ["{type}", "{scope}", "{message}"];
 
-  // Required placeholders
   if (!template.includes("{message}")) {
     return DEFAULT_TEMPLATE;
   }
-  // Detect invalid placeholders like {mesage}
   const matches = template.match(/{.*?}/g) || [];
 
   for (const match of matches) {
@@ -29,7 +29,6 @@ function normalizeTemplate(template: string): string {
 function generateSemanticDescription(events: SemanticEvent[]): string {
   if (events.length === 0) return "";
 
-  // Prioritize rename > signature > interface
   const priority: Record<string, number> = {
     function_rename: 1,
     api_signature_change: 2,
@@ -69,15 +68,16 @@ function generateSemanticDescription(events: SemanticEvent[]): string {
 
 /**
  * Build the commit description (the part after the colon).
- * Uses semantic events if available, otherwise falls back to file‑based heuristics.
+ * Uses semantic events if available, then enriched diff signals for detail,
+ * then falls back to file-based heuristics.
  */
 function buildDescription(
   type: string,
   scope: string | null,
   files: FileInfo[],
   semanticEvents?: SemanticEvent[],
+  diffSignals?: DiffSignals,
 ): string {
-  // If we have semantic events, use them to generate a precise description
   if (semanticEvents && semanticEvents.length > 0) {
     const semanticDesc = generateSemanticDescription(semanticEvents);
     if (semanticDesc) {
@@ -85,7 +85,13 @@ function buildDescription(
     }
   }
 
-  // Fallback to original heuristic logic
+  if (diffSignals && diffSignals.addedLines + diffSignals.deletedLines > 0) {
+    const detailedDesc = generateDetailedDescription(diffSignals, files);
+    if (detailedDesc && detailedDesc !== "update files") {
+      return detailedDesc;
+    }
+  }
+
   const nouns = files.map((f) => extractNoun(f.path)).filter(Boolean);
 
   const unique = Array.from(new Set(nouns));
@@ -133,7 +139,6 @@ function extractNoun(path: string): string {
     return parts[parts.length - 2];
   }
 
-  // Fix regex: match a dot followed by any characters except dot or slash until end
   return parts[parts.length - 1].replace(/\.[^/.]+$/, "");
 }
 
@@ -141,7 +146,6 @@ function enforceRules(message: string): string {
   const parts = message.split(": ");
 
   if (parts.length === 2) {
-    // Modify the second part in place
     parts[1] = parts[1].charAt(0).toLowerCase() + parts[1].slice(1);
   }
 
@@ -163,6 +167,7 @@ function enforceRules(message: string): string {
  * @param files - list of changed files with stats
  * @param format - optional template string (default: "{type}{scope}: {message}")
  * @param semanticEvents - optional semantic events from AST analysis
+ * @param diffSignals - optional enriched diff signals for detailed offline descriptions
  * @returns formatted commit message
  */
 export function generateCommitMessage(
@@ -171,8 +176,9 @@ export function generateCommitMessage(
   files: FileInfo[],
   format: string = DEFAULT_TEMPLATE,
   semanticEvents?: SemanticEvent[],
+  diffSignals?: DiffSignals,
 ): string {
-  const description = buildDescription(type, scope, files, semanticEvents);
+  const description = buildDescription(type, scope, files, semanticEvents, diffSignals);
 
   const safeTemplate = normalizeTemplate(format);
 

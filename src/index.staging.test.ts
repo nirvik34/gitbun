@@ -4,6 +4,7 @@ const {
   execFileSyncMock,
   promptMock,
   isGitRepoMock,
+  isFirstCommitMock,
   getStagedFilesMock,
   getDiffStatsMock,
   classifyCommitTypeMock,
@@ -23,6 +24,7 @@ const {
   execFileSyncMock: vi.fn(),
   promptMock: vi.fn(),
   isGitRepoMock: vi.fn(),
+  isFirstCommitMock: vi.fn(),
   getStagedFilesMock: vi.fn(),
   getDiffStatsMock: vi.fn(),
   classifyCommitTypeMock: vi.fn(),
@@ -71,6 +73,7 @@ vi.mock("ora", () => ({
 
 vi.mock("./git/checkRepo", () => ({
   isGitRepo: isGitRepoMock,
+  isFirstCommit: isFirstCommitMock,
 }));
 
 vi.mock("./git/getStagedFiles", () => ({
@@ -103,6 +106,29 @@ vi.mock("./analyzer/fileScorer", () => ({
 
 vi.mock("./analyzer/fileDeduplicator", () => ({
   deduplicateFiles: deduplicateFilesMock,
+}));
+
+vi.mock("./analyzer/diffScanner", () => ({
+  scanDiff: vi.fn().mockResolvedValue({
+    hasNewFunction: false,
+    hasRemovedCode: false,
+    hasBugFix: false,
+    hasRefactor: false,
+    hasOptimization: false,
+    newFunctions: [],
+    removedFunctions: [],
+    renamedFunctions: [],
+    newClasses: [],
+    removedClasses: [],
+    newImports: [],
+    removedImports: [],
+    newFiles: [],
+    deletedFiles: [],
+    renamedFiles: [],
+    functionSignatureChanges: [],
+    addedLines: 0,
+    deletedLines: 0,
+  }),
 }));
 
 vi.mock("./generator/commitGenerator", () => ({
@@ -146,6 +172,7 @@ describe("interactive staging UI", () => {
     vi.clearAllMocks();
 
     isGitRepoMock.mockResolvedValue(true);
+    isFirstCommitMock.mockResolvedValue(false);
     getStagedFilesMock.mockResolvedValue([]);
     getDiffStatsMock.mockResolvedValue({ additions: 1, deletions: 0 });
     detectScopeMock.mockReturnValue("core");
