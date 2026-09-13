@@ -1,3 +1,11 @@
+# [1.16.0](https://github.com/nirvik34/gitbun/compare/v1.15.0...v1.16.0) (2026-09-13)
+
+
+### Features
+
+* **analyzer:** add analyzer logic ([fb51888](https://github.com/nirvik34/gitbun/commit/fb5188810ebf54b65bdf1177209dcc2b9372347a))
+* **bin:** add bin logic ([0f19de1](https://github.com/nirvik34/gitbun/commit/0f19de1a14c3fc16e194f12f686f01fd16ba3895))
+
 # [1.15.0](https://github.com/nirvik34/gitbun/compare/v1.14.0...v1.15.0) (2026-06-05)
 
 
