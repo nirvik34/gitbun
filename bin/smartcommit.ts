@@ -15,12 +15,17 @@ program
   .option("--ai", "Enhance commit message using AI")
   .option("--auto", "Auto accept commit without confirmation")
   .option("--model <name>", "Specify Ollama model")
+  .option("--min-group-size <n>", "Minimum files per group for deduplication", "2")
   .option("--generate-only", "Print generated commit message to stdout (used by git hooks)")
   .option("--dry-run", "Print the generated commit message and exit without committing");
 
 program.action(async (options) => {
   try {
-    await run(options);
+    const opts = {
+      ...options,
+      minGroupSize: options.minGroupSize ? parseInt(options.minGroupSize, 10) : undefined,
+    };
+    await run(opts);
     process.exit(0);
   } catch (error: unknown) {
     if (error instanceof CancellationError) {

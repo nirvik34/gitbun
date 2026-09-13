@@ -35,6 +35,7 @@ interface CliOptions {
   generateOnly?: boolean;
   verbose?: boolean;
   dryRun?: boolean;
+  minGroupSize?: number;
   [key: string]: unknown;
 }
 
@@ -191,7 +192,7 @@ export async function run(options: CliOptions) {
     const prioritizedCandidates = sortBySignal(filteredFiles, getDiffForFile);
     const prioritizedFiles =
       prioritizedCandidates.length > 0 ? prioritizedCandidates : enrichedFiles;
-    const MIN_GROUP_SIZE = 2;
+    const MIN_GROUP_SIZE = options.minGroupSize ?? 2;
     const deduplicatedResult = deduplicateFiles(prioritizedFiles, MIN_GROUP_SIZE);
 
     const scope = detectScope(prioritizedFiles.map((f) => f.path));
